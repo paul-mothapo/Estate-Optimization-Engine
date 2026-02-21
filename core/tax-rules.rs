@@ -1,5 +1,8 @@
 use crate::jurisdictions::south_africa::south_africa_tax_rules_baseline;
 
+// Country rates/thresholds are owned by jurisdiction modules.
+// Keep these core types country-agnostic and route via `baseline_tax_rules_for`.
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TaxPayerClass {
     NaturalPerson,

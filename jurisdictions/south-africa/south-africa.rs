@@ -22,6 +22,8 @@ pub struct SouthAfricaJurisdictionLaw {
 
 #[derive(Debug, Clone)]
 pub struct SouthAfricaTaxSummary {
+    pub tax_year_context: &'static str,
+    pub rates_last_verified_on: &'static str,
     pub estate_duty_rate_main: f64,
     pub estate_duty_rate_above_30m: f64,
     pub estate_duty_section_4a_abatement_zar: f64,
@@ -32,6 +34,8 @@ pub struct SouthAfricaTaxSummary {
 
 fn summarize_tax_rules(rules: &JurisdictionTaxRuleSet) -> SouthAfricaTaxSummary {
     SouthAfricaTaxSummary {
+        tax_year_context: "2026 tax year context",
+        rates_last_verified_on: "2026-02-21",
         estate_duty_rate_main: rules.estate_duty.primary_rate,
         estate_duty_rate_above_30m: rules.estate_duty.secondary_rate,
         estate_duty_section_4a_abatement_zar: rules.estate_duty.section_4a_abatement_zar,
@@ -50,7 +54,7 @@ pub fn south_africa_tax_rules_baseline() -> JurisdictionTaxRuleSet {
             secondary_rate: 0.25,
             spouse_deduction_unlimited: true, // Estate Duty Act, section 4(q)
             effective_from: "2018-03-01",
-            source: "SARS Estate Duty (Estate Duty Act 45 of 1955)",
+            source: "SARS Estate Duty (accessed 2026-02-21)",
             source_url: "https://www.sars.gov.za/types-of-tax/estate-duty/",
         },
         donations_tax: DonationsTaxRule {
@@ -60,7 +64,7 @@ pub fn south_africa_tax_rules_baseline() -> JurisdictionTaxRuleSet {
             primary_rate_cap_cumulative_zar: 30_000_000.0,
             secondary_rate: 0.25,
             effective_from: "2018-03-01",
-            source: "SARS Donations Tax",
+            source: "SARS Donations Tax (accessed 2026-02-21)",
             source_url: "https://www.sars.gov.za/types-of-tax/donations-tax/",
         },
         cgt_on_death: CapitalGainsAtDeathRule {
@@ -70,7 +74,7 @@ pub fn south_africa_tax_rules_baseline() -> JurisdictionTaxRuleSet {
             inclusion_rate_trust: 0.80,
             base_cost_step_up_to_market_value_on_death: true,
             effective_from: "2016-03-01",
-            source: "SARS CGT 2025: exclusions and inclusion rates",
+            source: "SARS CGT (page updated 2025-05-21; accessed 2026-02-21)",
             source_url: "https://www.sars.gov.za/tax-rates/income-tax/capital-gains-tax-cgt/",
         },
     }
@@ -145,6 +149,7 @@ pub fn south_africa_jurisdiction_baseline() -> SouthAfricaJurisdictionLaw {
             rules.cgt_on_death.source_url,
         ],
         notes: vec![
+            "Tax rates in this baseline were last source-verified on 2026-02-21 against SARS pages.",
             "Spousal section 4(q) estate duty deduction is modeled as unlimited in baseline assumptions.",
             "Use this baseline as a rule catalog; actual tax calculation must still apply deductions, liabilities, and valuation rules.",
             "Rates and thresholds should be versioned by tax year before production use.",

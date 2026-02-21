@@ -35,6 +35,21 @@ The South Africa jurisdiction baseline currently models:
 
 This baseline is intended for planning simulations and comparative strategy scoring, not direct filing output.
 
+## Tax Baseline Verification (As of 2026-02-21)
+Latest verification date used for this package: `2026-02-21`.
+
+Verified baseline values:
+- Estate duty: 20% up to R30 million, 25% above R30 million, with section 4A abatement of R3.5 million.
+- Donations tax: 20% up to R30 million cumulative taxable donations, 25% above R30 million.
+- Donations exemptions: R100,000 annual exemption for natural persons; R10,000 for non-natural persons (casual gifts).
+- CGT at death (individual/special trust): annual exclusion of R300,000 in year of death.
+- CGT inclusion rates: 40% natural person/special trust, 80% company, 80% trust.
+
+Primary sources:
+- Estate duty: https://www.sars.gov.za/types-of-tax/estate-duty/
+- Donations tax: https://www.sars.gov.za/types-of-tax/donations-tax/
+- CGT rates and exclusions: https://www.sars.gov.za/tax-rates/income-tax/capital-gains-tax-cgt/
+
 ## Legalities and Compliance Boundaries
 The module is designed with the following legal boundaries in mind:
 - It supports planning logic, not legal advice.
