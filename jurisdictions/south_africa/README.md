@@ -69,7 +69,8 @@ Known limits of this baseline:
 - It does not yet cover every special-case exception in South African law.
 - It does not yet model all procedural requirements of estate administration.
 - It does not yet perform legal-document validity checks.
-- It is not yet linked to a formal tax-year/version registry in the repository.
+
+This provides a formal way to discover supported tax-year windows and version IDs used by the engine.
 
 ## Governance and Update Policy
 To keep legal quality high:

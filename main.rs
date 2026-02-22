@@ -18,4 +18,8 @@ mod scenario_tests;
 #[path = "tests/validation_tests.rs"]
 mod validation_tests;
 
+#[cfg(test)]
+#[path = "tests/rule_registry_tests.rs"]
+mod rule_registry_tests;
+
 fn main() {}

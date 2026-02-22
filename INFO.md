@@ -19,6 +19,8 @@ The rule flow is intentionally one-directional:
 
 This avoids country-specific constants in core logic and makes adding new jurisdictions predictable.
 
+This registry currently includes South Africa baseline version metadata and supported tax-year window.
+
 ## Combined Tax Liability Calculator
 The engine now calculates a single combined tax result for a South African estate scenario by aggregating:
 1. Estate duty

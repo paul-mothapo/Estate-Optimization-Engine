@@ -1,5 +1,6 @@
 use crate::jurisdictions::south_africa::{
     south_africa_latest_tax_rules,
+    south_africa_tax_rules_catalog,
     south_africa_tax_rules_for_year,
 };
 use std::fmt;
@@ -92,6 +93,12 @@ pub struct VersionedJurisdictionTaxRuleSet {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct TaxRuleRegistryEntry {
+    pub jurisdiction: Jurisdiction,
+    pub version: TaxRuleVersion,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TaxRuleSelectionError {
     UnsupportedTaxYear {
         jurisdiction: Jurisdiction,
@@ -115,6 +122,50 @@ impl fmt::Display for TaxRuleSelectionError {
 }
 
 impl std::error::Error for TaxRuleSelectionError {}
+
+pub fn supported_jurisdictions() -> Vec<Jurisdiction> {
+    vec![Jurisdiction::SouthAfrica]
+}
+
+pub fn tax_rule_registry_for(jurisdiction: Jurisdiction) -> Vec<TaxRuleVersion> {
+    match jurisdiction {
+        Jurisdiction::SouthAfrica => south_africa_tax_rules_catalog()
+            .into_iter()
+            .map(|versioned| versioned.version)
+            .collect(),
+    }
+}
+
+pub fn tax_rule_registry() -> Vec<TaxRuleRegistryEntry> {
+    supported_jurisdictions()
+        .into_iter()
+        .flat_map(|jurisdiction| {
+            tax_rule_registry_for(jurisdiction)
+                .into_iter()
+                .map(move |version| TaxRuleRegistryEntry {
+                    jurisdiction,
+                    version,
+                })
+        })
+        .collect()
+}
+
+pub fn supported_tax_year_window(jurisdiction: Jurisdiction) -> Option<(u16, Option<u16>)> {
+    let versions = tax_rule_registry_for(jurisdiction);
+    if versions.is_empty() {
+        return None;
+    }
+
+    let min_year = versions.iter().map(|version| version.tax_year_from).min()?;
+    let has_open_ended_window = versions.iter().any(|version| version.tax_year_to.is_none());
+    let max_year = if has_open_ended_window {
+        None
+    } else {
+        versions.iter().filter_map(|version| version.tax_year_to).max()
+    };
+
+    Some((min_year, max_year))
+}
 
 pub fn tax_rules_for(
     jurisdiction: Jurisdiction,
