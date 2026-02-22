@@ -1,5 +1,6 @@
 use crate::api::contracts::{
-    ApiErrorCode, ApiErrorResponse, ApiValidationIssue, JurisdictionTaxRuleRegistryResponse,
+    ApiErrorCode, ApiErrorResponse, ApiEstateScenarioInput, ApiOptimizedScenario,
+    ApiScenarioResult, ApiValidationIssue, JurisdictionTaxRuleRegistryResponse,
 };
 use crate::core::errors::EngineError;
 use crate::core::domain::models::{EstateScenarioInput, ScenarioResult};
@@ -84,10 +85,29 @@ pub fn calculate_single_scenario_api(
     calculate_single_scenario(input).map_err(to_api_error_response)
 }
 
+pub fn calculate_single_scenario_contract(
+    input: ApiEstateScenarioInput,
+) -> Result<ApiScenarioResult, ApiErrorResponse> {
+    let domain_input: EstateScenarioInput = input.into();
+    calculate_single_scenario_api(&domain_input).map(ApiScenarioResult::from)
+}
+
 pub fn optimize_candidate_scenarios_api(
     candidates: Vec<EstateScenarioInput>,
 ) -> Result<Option<OptimizedScenario>, ApiErrorResponse> {
     optimize_candidate_scenarios(candidates).map_err(to_api_error_response)
+}
+
+pub fn optimize_candidate_scenarios_contract(
+    candidates: Vec<ApiEstateScenarioInput>,
+) -> Result<Option<ApiOptimizedScenario>, ApiErrorResponse> {
+    let domain_candidates: Vec<EstateScenarioInput> = candidates
+        .into_iter()
+        .map(EstateScenarioInput::from)
+        .collect();
+
+    optimize_candidate_scenarios_api(domain_candidates)
+        .map(|candidate| candidate.map(ApiOptimizedScenario::from))
 }
 
 pub fn resolve_tax_rules_for_year_api(
