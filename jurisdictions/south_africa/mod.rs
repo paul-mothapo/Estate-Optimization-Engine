@@ -1,5 +1,6 @@
 use crate::core::rules::tax_rules::{
-    CapitalGainsAtDeathRule, DonationsTaxRule, EstateDutyRule, JurisdictionTaxRuleSet,
+    CapitalGainsAtDeathRule, DonationsTaxRule, EstateDutyRule, Jurisdiction,
+    JurisdictionTaxRuleSet, TaxRuleSelectionError, TaxRuleVersion, VersionedJurisdictionTaxRuleSet,
 };
 
 #[derive(Debug, Clone)]
@@ -34,7 +35,7 @@ pub struct SouthAfricaTaxSummary {
 
 fn summarize_tax_rules(rules: &JurisdictionTaxRuleSet) -> SouthAfricaTaxSummary {
     SouthAfricaTaxSummary {
-        tax_year_context: "2026 tax year context",
+        tax_year_context: "Tax years from 2018 onwards",
         rates_last_verified_on: "2026-02-21",
         estate_duty_rate_main: rules.estate_duty.primary_rate,
         estate_duty_rate_above_30m: rules.estate_duty.secondary_rate,
@@ -45,8 +46,17 @@ fn summarize_tax_rules(rules: &JurisdictionTaxRuleSet) -> SouthAfricaTaxSummary 
     }
 }
 
-pub fn south_africa_tax_rules_baseline() -> JurisdictionTaxRuleSet {
-    JurisdictionTaxRuleSet {
+fn south_africa_tax_rules_2018_onwards() -> VersionedJurisdictionTaxRuleSet {
+    VersionedJurisdictionTaxRuleSet {
+        version: TaxRuleVersion {
+            version_id: "ZA-ESTATE-BASELINE-2018+",
+            tax_year_from: 2018,
+            tax_year_to: None,
+            effective_from: "2018-03-01",
+            effective_to: None,
+            source_last_verified_on: "2026-02-21",
+        },
+        rules: JurisdictionTaxRuleSet {
         estate_duty: EstateDutyRule {
             section_4a_abatement_zar: 3_500_000.0,
             primary_rate: 0.20,
@@ -77,7 +87,40 @@ pub fn south_africa_tax_rules_baseline() -> JurisdictionTaxRuleSet {
             source: "SARS CGT (page updated 2025-05-21; accessed 2026-02-21)",
             source_url: "https://www.sars.gov.za/tax-rates/income-tax/capital-gains-tax-cgt/",
         },
+    },
     }
+}
+
+pub fn south_africa_tax_rules_catalog() -> Vec<VersionedJurisdictionTaxRuleSet> {
+    vec![south_africa_tax_rules_2018_onwards()]
+}
+
+pub fn south_africa_tax_rules_for_year(
+    tax_year: u16,
+) -> Result<VersionedJurisdictionTaxRuleSet, TaxRuleSelectionError> {
+    for versioned in south_africa_tax_rules_catalog() {
+        let from_ok = tax_year >= versioned.version.tax_year_from;
+        let to_ok = match versioned.version.tax_year_to {
+            Some(to) => tax_year <= to,
+            None => true,
+        };
+        if from_ok && to_ok {
+            return Ok(versioned);
+        }
+    }
+
+    Err(TaxRuleSelectionError::UnsupportedTaxYear {
+        jurisdiction: Jurisdiction::SouthAfrica,
+        tax_year,
+    })
+}
+
+pub fn south_africa_latest_tax_rules() -> VersionedJurisdictionTaxRuleSet {
+    south_africa_tax_rules_2018_onwards()
+}
+
+pub fn south_africa_tax_rules_baseline() -> JurisdictionTaxRuleSet {
+    south_africa_latest_tax_rules().rules
 }
 
 pub fn south_africa_jurisdiction_baseline() -> SouthAfricaJurisdictionLaw {

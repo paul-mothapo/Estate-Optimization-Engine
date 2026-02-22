@@ -1,6 +1,6 @@
 use crate::core::domain::models::{EstateAsset, EstateScenarioInput, ResidencyStatus};
 use crate::core::engine::scenario::calculate_combined_tax_and_liquidity;
-use crate::core::rules::tax_rules::{Jurisdiction, TaxPayerClass};
+use crate::core::rules::tax_rules::{Jurisdiction, TaxPayerClass, TaxRuleSelectionError};
 
 fn baseline_input() -> EstateScenarioInput {
     EstateScenarioInput {
@@ -29,7 +29,8 @@ fn applies_estate_duty_primary_and_secondary_bands() {
         qualifies_primary_residence_exclusion: false,
     });
 
-    let result = calculate_combined_tax_and_liquidity(&input);
+    let result = calculate_combined_tax_and_liquidity(&input)
+        .expect("Expected calculation to succeed for supported tax year");
     assert!((result.estate_duty.tax_payable_zar - 7_625_000.0).abs() < 0.1);
     assert!((result.liquidity.liquidity_gap_zar - 7_625_000.0).abs() < 0.1);
 }
@@ -64,7 +65,8 @@ fn applies_section_4q_spousal_deduction() {
         },
     ]);
 
-    let result = calculate_combined_tax_and_liquidity(&input);
+    let result = calculate_combined_tax_and_liquidity(&input)
+        .expect("Expected calculation to succeed for supported tax year");
     assert!((result.estate_duty.section_4q_spousal_deduction_zar - 20_000_000.0).abs() < 0.1);
     assert!((result.estate_duty.tax_payable_zar - 300_000.0).abs() < 0.1);
 }
@@ -100,6 +102,23 @@ fn excludes_foreign_assets_for_non_resident_estate_duty_scope() {
         },
     ]);
 
-    let result = calculate_combined_tax_and_liquidity(&input);
+    let result = calculate_combined_tax_and_liquidity(&input)
+        .expect("Expected calculation to succeed for supported tax year");
     assert!((result.estate_duty.gross_estate_for_estate_duty_zar - 10_000_000.0).abs() < 0.1);
+}
+
+#[test]
+fn calculation_rejects_unsupported_tax_year() {
+    let mut input = baseline_input();
+    input.tax_year = 2017;
+
+    let err = calculate_combined_tax_and_liquidity(&input)
+        .expect_err("Expected unsupported tax year to fail rule selection");
+    assert_eq!(
+        err,
+        TaxRuleSelectionError::UnsupportedTaxYear {
+            jurisdiction: Jurisdiction::SouthAfrica,
+            tax_year: 2017,
+        }
+    );
 }

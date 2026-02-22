@@ -29,6 +29,7 @@ impl EstateAsset {
 #[derive(Debug, Clone)]
 pub struct EstateScenarioInput {
     pub jurisdiction: Jurisdiction,
+    pub tax_year: u16,
     pub taxpayer_class: TaxPayerClass,
     pub residency_status: ResidencyStatus,
     pub marginal_income_tax_rate: f64,
@@ -55,6 +56,7 @@ impl Default for EstateScenarioInput {
     fn default() -> Self {
         Self {
             jurisdiction: Jurisdiction::SouthAfrica,
+            tax_year: 2026,
             taxpayer_class: TaxPayerClass::NaturalPerson,
             residency_status: ResidencyStatus::Resident,
             marginal_income_tax_rate: 0.45,

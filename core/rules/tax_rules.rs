@@ -1,4 +1,8 @@
-use crate::jurisdictions::south_africa::south_africa_tax_rules_baseline;
+use crate::jurisdictions::south_africa::{
+    south_africa_latest_tax_rules,
+    south_africa_tax_rules_for_year,
+};
+use std::fmt;
 
 // Country rates/thresholds are owned by jurisdiction modules.
 // Keep these core types country-agnostic and route via `baseline_tax_rules_for`.
@@ -14,6 +18,16 @@ pub enum TaxPayerClass {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Jurisdiction {
     SouthAfrica,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct TaxRuleVersion {
+    pub version_id: &'static str,
+    pub tax_year_from: u16,
+    pub tax_year_to: Option<u16>,
+    pub effective_from: &'static str,
+    pub effective_to: Option<&'static str>,
+    pub source_last_verified_on: &'static str,
 }
 
 #[derive(Debug, Clone)]
@@ -71,8 +85,56 @@ pub struct JurisdictionTaxRuleSet {
     pub cgt_on_death: CapitalGainsAtDeathRule,
 }
 
-pub fn baseline_tax_rules_for(jurisdiction: Jurisdiction) -> JurisdictionTaxRuleSet {
-    match jurisdiction {
-        Jurisdiction::SouthAfrica => south_africa_tax_rules_baseline(),
+#[derive(Debug, Clone)]
+pub struct VersionedJurisdictionTaxRuleSet {
+    pub version: TaxRuleVersion,
+    pub rules: JurisdictionTaxRuleSet,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TaxRuleSelectionError {
+    UnsupportedTaxYear {
+        jurisdiction: Jurisdiction,
+        tax_year: u16,
+    },
+}
+
+impl fmt::Display for TaxRuleSelectionError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            TaxRuleSelectionError::UnsupportedTaxYear {
+                jurisdiction,
+                tax_year,
+            } => write!(
+                f,
+                "No tax rule version found for jurisdiction {:?} and tax year {}",
+                jurisdiction, tax_year
+            ),
+        }
     }
+}
+
+impl std::error::Error for TaxRuleSelectionError {}
+
+pub fn tax_rules_for(
+    jurisdiction: Jurisdiction,
+    tax_year: u16,
+) -> Result<VersionedJurisdictionTaxRuleSet, TaxRuleSelectionError> {
+    match jurisdiction {
+        Jurisdiction::SouthAfrica => south_africa_tax_rules_for_year(tax_year),
+    }
+}
+
+pub fn latest_tax_rules_for(jurisdiction: Jurisdiction) -> VersionedJurisdictionTaxRuleSet {
+    match jurisdiction {
+        Jurisdiction::SouthAfrica => south_africa_latest_tax_rules(),
+    }
+}
+
+pub fn baseline_tax_rules_for(jurisdiction: Jurisdiction) -> JurisdictionTaxRuleSet {
+    latest_tax_rules_for(jurisdiction).rules
+}
+
+pub fn is_supported_tax_year(jurisdiction: Jurisdiction, tax_year: u16) -> bool {
+    tax_rules_for(jurisdiction, tax_year).is_ok()
 }

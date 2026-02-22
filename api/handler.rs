@@ -6,7 +6,7 @@ use crate::core::validation::InputValidationError;
 
 pub fn calculate_single_scenario(input: &EstateScenarioInput) -> Result<ScenarioResult, EngineError> {
     input.validate().map_err(EngineError::from)?;
-    Ok(calculate_combined_tax_and_liquidity(input))
+    calculate_combined_tax_and_liquidity(input).map_err(EngineError::from)
 }
 
 pub fn optimize_candidate_scenarios(
@@ -24,5 +24,5 @@ pub fn optimize_candidate_scenarios(
     if !all_issues.is_empty() {
         return Err(EngineError::Validation(InputValidationError::new(all_issues)));
     }
-    Ok(optimize_scenarios(candidates))
+    optimize_scenarios(candidates).map_err(EngineError::from)
 }

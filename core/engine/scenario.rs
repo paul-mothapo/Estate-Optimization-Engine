@@ -2,7 +2,9 @@ use crate::core::domain::models::{
     CapitalGainsTaxBreakdown, CombinedTaxLiability, EstateDutyBreakdown, EstateScenarioInput,
     LiquidityGapOutput, ResidencyStatus, ScenarioResult,
 };
-use crate::core::rules::tax_rules::{baseline_tax_rules_for, JurisdictionTaxRuleSet, TaxPayerClass};
+use crate::core::rules::tax_rules::{
+    tax_rules_for, JurisdictionTaxRuleSet, TaxPayerClass, TaxRuleSelectionError,
+};
 
 pub trait ScenarioCalculator {
     fn calculate(&self, input: &EstateScenarioInput) -> ScenarioResult;
@@ -14,10 +16,11 @@ pub struct SouthAfricaScenarioCalculator {
 }
 
 impl SouthAfricaScenarioCalculator {
-    pub fn new(input: &EstateScenarioInput) -> Self {
-        Self {
-            rules: baseline_tax_rules_for(input.jurisdiction),
-        }
+    pub fn new(input: &EstateScenarioInput) -> Result<Self, TaxRuleSelectionError> {
+        let selected = tax_rules_for(input.jurisdiction, input.tax_year)?;
+        Ok(Self {
+            rules: selected.rules,
+        })
     }
 
     fn clamp_rate(rate: f64) -> f64 {
@@ -271,7 +274,9 @@ impl ScenarioCalculator for SouthAfricaScenarioCalculator {
     }
 }
 
-pub fn calculate_combined_tax_and_liquidity(input: &EstateScenarioInput) -> ScenarioResult {
-    let calculator = SouthAfricaScenarioCalculator::new(input);
-    calculator.calculate(input)
+pub fn calculate_combined_tax_and_liquidity(
+    input: &EstateScenarioInput,
+) -> Result<ScenarioResult, TaxRuleSelectionError> {
+    let calculator = SouthAfricaScenarioCalculator::new(input)?;
+    Ok(calculator.calculate(input))
 }

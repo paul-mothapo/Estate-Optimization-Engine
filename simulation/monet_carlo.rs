@@ -1,5 +1,6 @@
 use crate::core::domain::models::{EstateScenarioInput, ScenarioResult};
 use crate::core::engine::scenario::calculate_combined_tax_and_liquidity;
+use crate::core::rules::tax_rules::TaxRuleSelectionError;
 
 #[derive(Debug, Clone)]
 pub struct StressResult {
@@ -12,7 +13,7 @@ pub fn run_liquidity_stress_grid(
     base_input: &EstateScenarioInput,
     market_value_shocks: &[f64],
     liquid_asset_haircuts: &[f64],
-) -> Vec<StressResult> {
+) -> Result<Vec<StressResult>, TaxRuleSelectionError> {
     let mut results = Vec::new();
 
     for shock in market_value_shocks {
@@ -28,7 +29,7 @@ pub fn run_liquidity_stress_grid(
                 }
             }
 
-            let outcome = calculate_combined_tax_and_liquidity(&shocked_input);
+            let outcome = calculate_combined_tax_and_liquidity(&shocked_input)?;
             results.push(StressResult {
                 market_value_shock: *shock,
                 liquid_asset_haircut: *haircut,
@@ -37,5 +38,5 @@ pub fn run_liquidity_stress_grid(
         }
     }
 
-    results
+    Ok(results)
 }

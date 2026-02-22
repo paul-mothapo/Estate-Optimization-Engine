@@ -1,5 +1,5 @@
 use crate::core::domain::models::{EstateAsset, EstateScenarioInput, ResidencyStatus};
-use crate::core::rules::tax_rules::TaxPayerClass;
+use crate::core::rules::tax_rules::{is_supported_tax_year, TaxPayerClass};
 use std::fmt;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -141,6 +141,13 @@ impl EstateAsset {
 impl EstateScenarioInput {
     pub fn validate(&self) -> Result<(), InputValidationError> {
         let mut issues = Vec::new();
+
+        if !is_supported_tax_year(self.jurisdiction, self.tax_year) {
+            issues.push(ValidationIssue::new(
+                "tax_year".to_string(),
+                format!("Tax year {} is not supported for {:?}", self.tax_year, self.jurisdiction),
+            ));
+        }
 
         if self.assets.is_empty() {
             issues.push(ValidationIssue::new(

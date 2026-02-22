@@ -51,6 +51,15 @@ fn rejects_out_of_range_rates() {
 }
 
 #[test]
+fn rejects_unsupported_tax_year() {
+    let mut input = valid_input();
+    input.tax_year = 2017;
+
+    let err = input.validate().expect_err("Expected validation to fail");
+    assert!(err.issues.iter().any(|i| i.field == "tax_year"));
+}
+
+#[test]
 fn rejects_negative_amounts() {
     let mut input = valid_input();
     input.funeral_costs_zar = -10.0;
