@@ -1,6 +1,8 @@
 use crate::api::contracts::{
-    ApiErrorCode, ApiErrorResponse, ApiEstateScenarioInput, ApiOptimizedScenario,
-    ApiScenarioResult, ApiValidationIssue, JurisdictionTaxRuleRegistryResponse,
+    ApiErrorCode, ApiErrorResponse, ApiEstateScenarioInput, ApiJurisdiction,
+    ApiJurisdictionTaxRuleRegistryResponse, ApiOptimizedScenario, ApiScenarioResult,
+    ApiTaxRuleRegistryEntry, ApiValidationIssue, ApiVersionedJurisdictionTaxRuleSet,
+    JurisdictionTaxRuleRegistryResponse,
 };
 use crate::core::errors::EngineError;
 use crate::core::domain::models::{EstateScenarioInput, ScenarioResult};
@@ -17,8 +19,22 @@ pub fn list_supported_jurisdictions() -> Vec<Jurisdiction> {
     supported_jurisdictions()
 }
 
+pub fn list_supported_jurisdictions_contract() -> Vec<ApiJurisdiction> {
+    list_supported_jurisdictions()
+        .into_iter()
+        .map(ApiJurisdiction::from)
+        .collect()
+}
+
 pub fn list_tax_rule_registry_entries() -> Vec<TaxRuleRegistryEntry> {
     tax_rule_registry()
+}
+
+pub fn list_tax_rule_registry_entries_contract() -> Vec<ApiTaxRuleRegistryEntry> {
+    list_tax_rule_registry_entries()
+        .into_iter()
+        .map(ApiTaxRuleRegistryEntry::from)
+        .collect()
 }
 
 pub fn get_jurisdiction_tax_rule_registry(
@@ -41,6 +57,13 @@ pub fn get_jurisdiction_tax_rule_registry(
     })
 }
 
+pub fn get_jurisdiction_tax_rule_registry_contract(
+    jurisdiction: ApiJurisdiction,
+) -> Option<ApiJurisdictionTaxRuleRegistryResponse> {
+    get_jurisdiction_tax_rule_registry(jurisdiction.into())
+        .map(ApiJurisdictionTaxRuleRegistryResponse::from)
+}
+
 pub fn resolve_tax_rules_for_year(
     jurisdiction: Jurisdiction,
     tax_year: u16,
@@ -48,8 +71,22 @@ pub fn resolve_tax_rules_for_year(
     tax_rules_for(jurisdiction, tax_year).map_err(EngineError::from)
 }
 
+pub fn resolve_tax_rules_for_year_contract(
+    jurisdiction: ApiJurisdiction,
+    tax_year: u16,
+) -> Result<ApiVersionedJurisdictionTaxRuleSet, ApiErrorResponse> {
+    resolve_tax_rules_for_year_api(jurisdiction.into(), tax_year)
+        .map(ApiVersionedJurisdictionTaxRuleSet::from)
+}
+
 pub fn resolve_latest_tax_rules(jurisdiction: Jurisdiction) -> VersionedJurisdictionTaxRuleSet {
     latest_tax_rules_for(jurisdiction)
+}
+
+pub fn resolve_latest_tax_rules_contract(
+    jurisdiction: ApiJurisdiction,
+) -> ApiVersionedJurisdictionTaxRuleSet {
+    resolve_latest_tax_rules(jurisdiction.into()).into()
 }
 
 pub fn to_api_error_response(error: EngineError) -> ApiErrorResponse {
