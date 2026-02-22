@@ -4,7 +4,8 @@ use crate::core::engine::optimizer::{optimize_scenarios, OptimizedScenario};
 use crate::core::engine::scenario::calculate_combined_tax_and_liquidity;
 use crate::core::rules::tax_rules::{
     latest_tax_rules_for, supported_jurisdictions, supported_tax_year_window, tax_rule_registry,
-    tax_rule_registry_for, Jurisdiction, TaxRuleRegistryEntry, TaxRuleVersion,
+    tax_rule_registry_for, tax_rules_for, Jurisdiction, TaxRuleRegistryEntry, TaxRuleVersion,
+    VersionedJurisdictionTaxRuleSet,
 };
 use crate::core::validation::InputValidationError;
 
@@ -43,6 +44,17 @@ pub fn get_jurisdiction_tax_rule_registry(
         supported_tax_year_to,
         latest_version_id,
     })
+}
+
+pub fn resolve_tax_rules_for_year(
+    jurisdiction: Jurisdiction,
+    tax_year: u16,
+) -> Result<VersionedJurisdictionTaxRuleSet, EngineError> {
+    tax_rules_for(jurisdiction, tax_year).map_err(EngineError::from)
+}
+
+pub fn resolve_latest_tax_rules(jurisdiction: Jurisdiction) -> VersionedJurisdictionTaxRuleSet {
+    latest_tax_rules_for(jurisdiction)
 }
 
 pub fn calculate_single_scenario(input: &EstateScenarioInput) -> Result<ScenarioResult, EngineError> {

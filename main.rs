@@ -11,19 +11,7 @@ pub mod api;
 pub mod simulation;
 
 #[cfg(test)]
-#[path = "tests/scenario_tests.rs"]
-mod scenario_tests;
-
-#[cfg(test)]
-#[path = "tests/validation_tests.rs"]
-mod validation_tests;
-
-#[cfg(test)]
-#[path = "tests/rule_registry_tests.rs"]
-mod rule_registry_tests;
-
-#[cfg(test)]
-#[path = "tests/api_registry_tests.rs"]
-mod api_registry_tests;
+#[path = "tests/mod.rs"]
+mod tests;
 
 fn main() {}
