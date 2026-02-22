@@ -1,6 +1,6 @@
-use crate::core::models::{EstateAsset, EstateScenarioInput, ResidencyStatus};
-use crate::core::scenario::calculate_combined_tax_and_liquidity;
-use crate::core::tax_rules::{Jurisdiction, TaxPayerClass};
+use crate::core::domain::models::{EstateAsset, EstateScenarioInput, ResidencyStatus};
+use crate::core::engine::scenario::calculate_combined_tax_and_liquidity;
+use crate::core::rules::tax_rules::{Jurisdiction, TaxPayerClass};
 
 fn baseline_input() -> EstateScenarioInput {
     EstateScenarioInput {

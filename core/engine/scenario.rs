@@ -1,8 +1,8 @@
-use crate::core::models::{
+use crate::core::domain::models::{
     CapitalGainsTaxBreakdown, CombinedTaxLiability, EstateDutyBreakdown, EstateScenarioInput,
     LiquidityGapOutput, ResidencyStatus, ScenarioResult,
 };
-use crate::core::tax_rules::{baseline_tax_rules_for, JurisdictionTaxRuleSet, TaxPayerClass};
+use crate::core::rules::tax_rules::{baseline_tax_rules_for, JurisdictionTaxRuleSet, TaxPayerClass};
 
 pub trait ScenarioCalculator {
     fn calculate(&self, input: &EstateScenarioInput) -> ScenarioResult;

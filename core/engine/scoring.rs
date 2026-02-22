@@ -1,4 +1,4 @@
-use crate::core::models::ScenarioResult;
+use crate::core::domain::models::ScenarioResult;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LiquidityRiskBand {

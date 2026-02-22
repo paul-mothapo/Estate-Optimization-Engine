@@ -77,3 +77,4 @@ To keep legal quality high:
 - Core tax logic should call into jurisdiction providers and avoid hardcoded country values.
 - Any legal or tax update should include source verification and effective-date review.
 - Changes should be logged with rationale so planners can trace why scenario outputs changed.
+

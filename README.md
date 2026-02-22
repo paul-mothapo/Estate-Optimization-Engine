@@ -1,3 +1,7 @@
+# NOTE
+This follows:
+A modular layered architecture with a domain-centric core and plug-in jurisdiction modules.
+
 # Estate Optimization Engine
 
 South Africa estate-planning engine with:
@@ -25,4 +29,4 @@ rustc --edition 2021 --test main.rs -o .\estate-engine-tests.exe
 ```
 
 Tax baseline status:
-- South Africa rates and thresholds were source-verified on `2026-02-21` in `jurisdictions/south-africa/south-africa.rs`.
+- South Africa rates and thresholds were source-verified on `2026-02-21` in `jurisdictions/south_africa/mod.rs`.

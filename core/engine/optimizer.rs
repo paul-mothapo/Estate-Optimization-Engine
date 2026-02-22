@@ -1,6 +1,6 @@
-use crate::core::models::{EstateScenarioInput, ScenarioResult};
-use crate::core::scenario::calculate_combined_tax_and_liquidity;
-use crate::core::scoring::{score_scenario, ScenarioScore};
+use crate::core::domain::models::{EstateScenarioInput, ScenarioResult};
+use crate::core::engine::scenario::calculate_combined_tax_and_liquidity;
+use crate::core::engine::scoring::{score_scenario, ScenarioScore};
 
 #[derive(Debug, Clone)]
 pub struct OptimizedScenario {

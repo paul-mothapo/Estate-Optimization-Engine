@@ -1,4 +1,4 @@
-use crate::core::tax_rules::{Jurisdiction, TaxPayerClass};
+use crate::core::rules::tax_rules::{Jurisdiction, TaxPayerClass};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ResidencyStatus {

@@ -1,4 +1,4 @@
-use crate::core::tax_rules::{
+use crate::core::rules::tax_rules::{
     CapitalGainsAtDeathRule, DonationsTaxRule, EstateDutyRule, JurisdictionTaxRuleSet,
 };
 

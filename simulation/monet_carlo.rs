@@ -1,5 +1,5 @@
-use crate::core::models::{EstateScenarioInput, ScenarioResult};
-use crate::core::scenario::calculate_combined_tax_and_liquidity;
+use crate::core::domain::models::{EstateScenarioInput, ScenarioResult};
+use crate::core::engine::scenario::calculate_combined_tax_and_liquidity;
 
 #[derive(Debug, Clone)]
 pub struct StressResult {

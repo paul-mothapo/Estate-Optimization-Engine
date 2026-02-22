@@ -1,33 +1,21 @@
-pub mod jurisdictions {
-    #[path = "south-africa/south-africa.rs"]
-    pub mod south_africa;
-}
+#[path = "jurisdictions/mod.rs"]
+pub mod jurisdictions;
 
-pub mod core {
-    #[path = "tax-rules.rs"]
-    pub mod tax_rules;
-    #[path = "models.rs"]
-    pub mod models;
-    #[path = "scenario.rs"]
-    pub mod scenario;
-    #[path = "scoring.rs"]
-    pub mod scoring;
-    #[path = "optimizer.rs"]
-    pub mod optimizer;
-}
+#[path = "core/mod.rs"]
+pub mod core;
 
-pub mod api {
-    #[path = "handler.rs"]
-    pub mod handler;
-}
+#[path = "api/mod.rs"]
+pub mod api;
 
-pub mod simulation {
-    #[path = "monet-carlo.rs"]
-    pub mod monet_carlo;
-}
+#[path = "simulation/mod.rs"]
+pub mod simulation;
 
 #[cfg(test)]
 #[path = "tests/scenario_tests.rs"]
 mod scenario_tests;
+
+#[cfg(test)]
+#[path = "tests/validation_tests.rs"]
+mod validation_tests;
 
 fn main() {}
