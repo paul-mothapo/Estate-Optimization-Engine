@@ -8,6 +8,7 @@ use crate::core::rules::tax_rules::{
     CapitalGainsAtDeathRule, DonationsTaxRule, EstateDutyRule, Jurisdiction, JurisdictionTaxRuleSet,
     TaxPayerClass, TaxRuleRegistryEntry, TaxRuleVersion, VersionedJurisdictionTaxRuleSet,
 };
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct JurisdictionTaxRuleRegistryResponse {
@@ -18,7 +19,7 @@ pub struct JurisdictionTaxRuleRegistryResponse {
     pub latest_version_id: &'static str,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ApiJurisdiction {
     SouthAfrica,
 }
@@ -39,7 +40,7 @@ impl From<ApiJurisdiction> for Jurisdiction {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ApiTaxRuleVersion {
     pub version_id: String,
     pub tax_year_from: u16,
@@ -62,7 +63,7 @@ impl From<TaxRuleVersion> for ApiTaxRuleVersion {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ApiTaxRuleRegistryEntry {
     pub jurisdiction: ApiJurisdiction,
     pub version: ApiTaxRuleVersion,
@@ -77,7 +78,7 @@ impl From<TaxRuleRegistryEntry> for ApiTaxRuleRegistryEntry {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ApiJurisdictionTaxRuleRegistryResponse {
     pub jurisdiction: ApiJurisdiction,
     pub versions: Vec<ApiTaxRuleVersion>,
@@ -98,7 +99,7 @@ impl From<JurisdictionTaxRuleRegistryResponse> for ApiJurisdictionTaxRuleRegistr
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ApiEstateDutyRule {
     pub section_4a_abatement_zar: f64,
     pub primary_rate: f64,
@@ -125,7 +126,7 @@ impl From<EstateDutyRule> for ApiEstateDutyRule {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ApiDonationsTaxRule {
     pub annual_exemption_natural_person_zar: f64,
     pub annual_exemption_non_natural_casual_gifts_zar: f64,
@@ -153,7 +154,7 @@ impl From<DonationsTaxRule> for ApiDonationsTaxRule {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ApiCapitalGainsAtDeathRule {
     pub annual_exclusion_in_year_of_death_zar: f64,
     pub inclusion_rate_natural_person: f64,
@@ -180,7 +181,7 @@ impl From<CapitalGainsAtDeathRule> for ApiCapitalGainsAtDeathRule {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ApiJurisdictionTaxRuleSet {
     pub estate_duty: ApiEstateDutyRule,
     pub donations_tax: ApiDonationsTaxRule,
@@ -197,7 +198,7 @@ impl From<JurisdictionTaxRuleSet> for ApiJurisdictionTaxRuleSet {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ApiVersionedJurisdictionTaxRuleSet {
     pub version: ApiTaxRuleVersion,
     pub rules: ApiJurisdictionTaxRuleSet,
@@ -212,27 +213,32 @@ impl From<VersionedJurisdictionTaxRuleSet> for ApiVersionedJurisdictionTaxRuleSe
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ApiErrorCode {
     Validation,
     RuleSelection,
     Computation,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ApiValidationIssue {
     pub field: String,
     pub message: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ApiErrorResponse {
     pub code: ApiErrorCode,
     pub message: String,
     pub validation_issues: Vec<ApiValidationIssue>,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ApiHealthResponse {
+    pub status: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ApiEstateAssetInput {
     pub name: String,
     pub market_value_zar: f64,
@@ -246,12 +252,66 @@ pub struct ApiEstateAssetInput {
     pub qualifies_primary_residence_exclusion: bool,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub enum ApiTaxPayerClass {
+    NaturalPerson,
+    Company,
+    Trust,
+    SpecialTrust,
+}
+
+impl From<TaxPayerClass> for ApiTaxPayerClass {
+    fn from(value: TaxPayerClass) -> Self {
+        match value {
+            TaxPayerClass::NaturalPerson => ApiTaxPayerClass::NaturalPerson,
+            TaxPayerClass::Company => ApiTaxPayerClass::Company,
+            TaxPayerClass::Trust => ApiTaxPayerClass::Trust,
+            TaxPayerClass::SpecialTrust => ApiTaxPayerClass::SpecialTrust,
+        }
+    }
+}
+
+impl From<ApiTaxPayerClass> for TaxPayerClass {
+    fn from(value: ApiTaxPayerClass) -> Self {
+        match value {
+            ApiTaxPayerClass::NaturalPerson => TaxPayerClass::NaturalPerson,
+            ApiTaxPayerClass::Company => TaxPayerClass::Company,
+            ApiTaxPayerClass::Trust => TaxPayerClass::Trust,
+            ApiTaxPayerClass::SpecialTrust => TaxPayerClass::SpecialTrust,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub enum ApiResidencyStatus {
+    Resident,
+    NonResident,
+}
+
+impl From<ResidencyStatus> for ApiResidencyStatus {
+    fn from(value: ResidencyStatus) -> Self {
+        match value {
+            ResidencyStatus::Resident => ApiResidencyStatus::Resident,
+            ResidencyStatus::NonResident => ApiResidencyStatus::NonResident,
+        }
+    }
+}
+
+impl From<ApiResidencyStatus> for ResidencyStatus {
+    fn from(value: ApiResidencyStatus) -> Self {
+        match value {
+            ApiResidencyStatus::Resident => ResidencyStatus::Resident,
+            ApiResidencyStatus::NonResident => ResidencyStatus::NonResident,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ApiEstateScenarioInput {
-    pub jurisdiction: Jurisdiction,
+    pub jurisdiction: ApiJurisdiction,
     pub tax_year: u16,
-    pub taxpayer_class: TaxPayerClass,
-    pub residency_status: ResidencyStatus,
+    pub taxpayer_class: ApiTaxPayerClass,
+    pub residency_status: ApiResidencyStatus,
     pub marginal_income_tax_rate: f64,
     pub assets: Vec<ApiEstateAssetInput>,
     pub debts_and_loans_zar: f64,
@@ -309,10 +369,10 @@ impl From<EstateAsset> for ApiEstateAssetInput {
 impl From<ApiEstateScenarioInput> for EstateScenarioInput {
     fn from(value: ApiEstateScenarioInput) -> Self {
         EstateScenarioInput {
-            jurisdiction: value.jurisdiction,
+            jurisdiction: value.jurisdiction.into(),
             tax_year: value.tax_year,
-            taxpayer_class: value.taxpayer_class,
-            residency_status: value.residency_status,
+            taxpayer_class: value.taxpayer_class.into(),
+            residency_status: value.residency_status.into(),
             marginal_income_tax_rate: value.marginal_income_tax_rate,
             assets: value.assets.into_iter().map(EstateAsset::from).collect(),
             debts_and_loans_zar: value.debts_and_loans_zar,
@@ -339,10 +399,10 @@ impl From<ApiEstateScenarioInput> for EstateScenarioInput {
 impl From<EstateScenarioInput> for ApiEstateScenarioInput {
     fn from(value: EstateScenarioInput) -> Self {
         ApiEstateScenarioInput {
-            jurisdiction: value.jurisdiction,
+            jurisdiction: value.jurisdiction.into(),
             tax_year: value.tax_year,
-            taxpayer_class: value.taxpayer_class,
-            residency_status: value.residency_status,
+            taxpayer_class: value.taxpayer_class.into(),
+            residency_status: value.residency_status.into(),
             marginal_income_tax_rate: value.marginal_income_tax_rate,
             assets: value.assets.into_iter().map(ApiEstateAssetInput::from).collect(),
             debts_and_loans_zar: value.debts_and_loans_zar,
@@ -366,7 +426,7 @@ impl From<EstateScenarioInput> for ApiEstateScenarioInput {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ApiCapitalGainsTaxBreakdown {
     pub gross_capital_gain_zar: f64,
     pub primary_residence_exclusion_used_zar: f64,
@@ -376,7 +436,7 @@ pub struct ApiCapitalGainsTaxBreakdown {
     pub tax_payable_zar: f64,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ApiEstateDutyBreakdown {
     pub gross_estate_for_estate_duty_zar: f64,
     pub executor_fee_zar: f64,
@@ -388,7 +448,7 @@ pub struct ApiEstateDutyBreakdown {
     pub tax_payable_zar: f64,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ApiCombinedTaxLiability {
     pub estate_duty_zar: f64,
     pub cgt_on_death_zar: f64,
@@ -397,7 +457,7 @@ pub struct ApiCombinedTaxLiability {
     pub total_tax_liability_zar: f64,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ApiLiquidityGapOutput {
     pub liquid_assets_in_estate_zar: f64,
     pub external_liquidity_proceeds_zar: f64,
@@ -409,7 +469,7 @@ pub struct ApiLiquidityGapOutput {
     pub liquidity_surplus_zar: f64,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ApiScenarioResult {
     pub cgt: ApiCapitalGainsTaxBreakdown,
     pub estate_duty: ApiEstateDutyBreakdown,
@@ -483,7 +543,7 @@ impl From<ScenarioResult> for ApiScenarioResult {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ApiLiquidityRiskBand {
     Low,
     Moderate,
@@ -502,7 +562,7 @@ impl From<LiquidityRiskBand> for ApiLiquidityRiskBand {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ApiScenarioScore {
     pub tax_burden_ratio: f64,
     pub liquidity_cover_ratio: f64,
@@ -521,7 +581,7 @@ impl From<ScenarioScore> for ApiScenarioScore {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ApiOptimizedScenario {
     pub index: usize,
     pub input: ApiEstateScenarioInput,

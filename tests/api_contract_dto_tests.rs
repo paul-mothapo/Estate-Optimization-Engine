@@ -3,6 +3,7 @@ use crate::api::handler::{
     calculate_single_scenario_contract, optimize_candidate_scenarios_contract,
 };
 use crate::core::domain::models::EstateScenarioInput;
+use crate::core::rules::tax_rules::Jurisdiction;
 
 fn valid_contract_input() -> ApiEstateScenarioInput {
     let mut input = ApiEstateScenarioInput::from(EstateScenarioInput::default());
@@ -27,7 +28,7 @@ fn contract_input_maps_to_domain_input() {
     let input = valid_contract_input();
     let domain: EstateScenarioInput = input.clone().into();
 
-    assert_eq!(domain.jurisdiction, input.jurisdiction);
+    assert_eq!(domain.jurisdiction, Jurisdiction::from(input.jurisdiction));
     assert_eq!(domain.tax_year, input.tax_year);
     assert_eq!(domain.assets.len(), 1);
     assert_eq!(domain.assets[0].name, "Contract Asset");

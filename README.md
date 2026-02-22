@@ -1,32 +1,51 @@
-# NOTE
-This follows:
-A modular layered architecture with a domain-centric core and plug-in jurisdiction modules.
-
 # Estate Optimization Engine
 
 South Africa estate-planning engine with:
 - Combined Tax Liability calculation
 - Liquidity Gap output
+- Tax-rule version registry
+- HTTP API (Cargo + Axum)
+
+## Stack
+- Rust 2021
+- Cargo
+- Axum + Tokio
 
 ## Run
-Prerequisite:
-- Rust installed (`rustc --version`)
+Prerequisites:
+- Rust toolchain (`cargo --version`)
 
-Build executable:
-```powershell
-rustc --edition 2021 main.rs -o .\estate-engine.exe
+Start API server:
+```bash
+cargo run
 ```
 
-Run executable:
-```powershell
-.\estate-engine.exe
+Custom bind address:
+```bash
+ENGINE_BIND=0.0.0.0:8080 cargo run
 ```
 
-Run tests:
-```powershell
-rustc --edition 2021 --test main.rs -o .\estate-engine-tests.exe
-.\estate-engine-tests.exe
+Compile checks:
+```bash
+cargo check
+cargo check --all-targets
 ```
 
-Tax baseline status:
-- South Africa rates and thresholds were source-verified on `2026-02-21` in `jurisdictions/south_africa/mod.rs`.
+## HTTP Endpoints
+- `GET /health`
+- `GET /v1/jurisdictions`
+- `GET /v1/rules/registry`
+- `GET /v1/rules/registry/{jurisdiction}`
+- `GET /v1/rules/latest/{jurisdiction}`
+- `GET /v1/rules/{jurisdiction}/{tax_year}`
+- `POST /v1/scenario/calculate`
+- `POST /v1/scenario/optimize`
+
+Jurisdiction path values currently supported:
+- `south-africa`
+- `south_africa`
+- `southafrica`
+- `za`
+
+## Verification
+Tax baselines are maintained in `jurisdictions/south_africa/mod.rs` and currently source-verified as of `2026-02-21`.
