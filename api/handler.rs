@@ -1,22 +1,16 @@
+use crate::api::contracts::{
+    ApiErrorCode, ApiErrorResponse, ApiValidationIssue, JurisdictionTaxRuleRegistryResponse,
+};
 use crate::core::errors::EngineError;
 use crate::core::domain::models::{EstateScenarioInput, ScenarioResult};
 use crate::core::engine::optimizer::{optimize_scenarios, OptimizedScenario};
 use crate::core::engine::scenario::calculate_combined_tax_and_liquidity;
 use crate::core::rules::tax_rules::{
     latest_tax_rules_for, supported_jurisdictions, supported_tax_year_window, tax_rule_registry,
-    tax_rule_registry_for, tax_rules_for, Jurisdiction, TaxRuleRegistryEntry, TaxRuleVersion,
+    tax_rule_registry_for, tax_rules_for, Jurisdiction, TaxRuleRegistryEntry,
     VersionedJurisdictionTaxRuleSet,
 };
 use crate::core::validation::InputValidationError;
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct JurisdictionTaxRuleRegistryResponse {
-    pub jurisdiction: Jurisdiction,
-    pub versions: Vec<TaxRuleVersion>,
-    pub supported_tax_year_from: u16,
-    pub supported_tax_year_to: Option<u16>,
-    pub latest_version_id: &'static str,
-}
 
 pub fn list_supported_jurisdictions() -> Vec<Jurisdiction> {
     supported_jurisdictions()
@@ -55,6 +49,52 @@ pub fn resolve_tax_rules_for_year(
 
 pub fn resolve_latest_tax_rules(jurisdiction: Jurisdiction) -> VersionedJurisdictionTaxRuleSet {
     latest_tax_rules_for(jurisdiction)
+}
+
+pub fn to_api_error_response(error: EngineError) -> ApiErrorResponse {
+    match error {
+        EngineError::Validation(validation_error) => ApiErrorResponse {
+            code: ApiErrorCode::Validation,
+            message: validation_error.to_string(),
+            validation_issues: validation_error
+                .issues
+                .into_iter()
+                .map(|issue| ApiValidationIssue {
+                    field: issue.field,
+                    message: issue.message,
+                })
+                .collect(),
+        },
+        EngineError::RuleSelection(selection_error) => ApiErrorResponse {
+            code: ApiErrorCode::RuleSelection,
+            message: selection_error.to_string(),
+            validation_issues: Vec::new(),
+        },
+        EngineError::Computation(message) => ApiErrorResponse {
+            code: ApiErrorCode::Computation,
+            message,
+            validation_issues: Vec::new(),
+        },
+    }
+}
+
+pub fn calculate_single_scenario_api(
+    input: &EstateScenarioInput,
+) -> Result<ScenarioResult, ApiErrorResponse> {
+    calculate_single_scenario(input).map_err(to_api_error_response)
+}
+
+pub fn optimize_candidate_scenarios_api(
+    candidates: Vec<EstateScenarioInput>,
+) -> Result<Option<OptimizedScenario>, ApiErrorResponse> {
+    optimize_candidate_scenarios(candidates).map_err(to_api_error_response)
+}
+
+pub fn resolve_tax_rules_for_year_api(
+    jurisdiction: Jurisdiction,
+    tax_year: u16,
+) -> Result<VersionedJurisdictionTaxRuleSet, ApiErrorResponse> {
+    resolve_tax_rules_for_year(jurisdiction, tax_year).map_err(to_api_error_response)
 }
 
 pub fn calculate_single_scenario(input: &EstateScenarioInput) -> Result<ScenarioResult, EngineError> {
