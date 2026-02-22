@@ -38,10 +38,6 @@ Key South African rules currently applied in this flow:
 ## Liquidity Gap Output
 The engine now calculates liquidity sufficiency for settlement costs and taxes.
 
-Formula:
-- `liquidity_gap = max(0, immediate_cash_requirements - total_available_liquidity)`
-- `liquidity_surplus = max(0, total_available_liquidity - immediate_cash_requirements)`
-
 Immediate cash requirements include:
 - Combined tax liability
 - Debts and loans
@@ -54,12 +50,6 @@ Available liquidity includes:
 - Liquid assets inside the estate
 - External liquidity proceeds
 - Cash reserve
-
-Output is available in `ScenarioResult.liquidity` with fields for:
-- Available liquidity totals
-- Immediate cash requirement total
-- Liquidity gap
-- Liquidity surplus
 
 ## Legal Positioning
 This project is a decision-support engine for planning analysis.

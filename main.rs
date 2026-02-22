@@ -22,4 +22,8 @@ mod validation_tests;
 #[path = "tests/rule_registry_tests.rs"]
 mod rule_registry_tests;
 
+#[cfg(test)]
+#[path = "tests/api_registry_tests.rs"]
+mod api_registry_tests;
+
 fn main() {}
