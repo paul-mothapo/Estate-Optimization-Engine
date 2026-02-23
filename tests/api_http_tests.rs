@@ -27,6 +27,27 @@ async fn health_endpoint_returns_ok() {
 }
 
 #[tokio::test]
+async fn health_db_endpoint_returns_service_unavailable_without_pool() {
+    let response = app()
+        .oneshot(
+            Request::builder()
+                .uri("/health/db")
+                .body(Body::empty())
+                .expect("Failed to build request"),
+        )
+        .await
+        .expect("Route call failed");
+
+    assert_eq!(response.status(), StatusCode::SERVICE_UNAVAILABLE);
+    let body = to_bytes(response.into_body(), usize::MAX)
+        .await
+        .expect("Failed to read body");
+    let parsed: ApiErrorResponse =
+        serde_json::from_slice(&body).expect("Failed to deserialize error response");
+    assert_eq!(parsed.code, ApiErrorCode::Computation);
+}
+
+#[tokio::test]
 async fn calculate_endpoint_returns_validation_error_for_empty_assets() {
     let payload = ApiEstateScenarioInput::from(EstateScenarioInput::default());
     let body = serde_json::to_vec(&payload).expect("Failed to serialize payload");
@@ -76,4 +97,26 @@ async fn rules_endpoint_returns_rule_selection_error_for_unsupported_year() {
         serde_json::from_slice(&body).expect("Failed to deserialize error response");
     assert_eq!(parsed.code, ApiErrorCode::RuleSelection);
     assert!(parsed.message.contains("2017"));
+}
+
+#[tokio::test]
+async fn openapi_endpoint_returns_spec() {
+    let response = app()
+        .oneshot(
+            Request::builder()
+                .uri("/api-docs/openapi.json")
+                .body(Body::empty())
+                .expect("Failed to build request"),
+        )
+        .await
+        .expect("Route call failed");
+
+    assert_eq!(response.status(), StatusCode::OK);
+    let body = to_bytes(response.into_body(), usize::MAX)
+        .await
+        .expect("Failed to read body");
+    let parsed: serde_json::Value =
+        serde_json::from_slice(&body).expect("Failed to deserialize OpenAPI spec");
+    assert!(parsed.get("openapi").is_some());
+    assert!(parsed.get("paths").is_some());
 }

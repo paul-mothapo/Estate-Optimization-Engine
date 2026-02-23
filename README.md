@@ -31,21 +31,5 @@ cargo check
 cargo check --all-targets
 ```
 
-## HTTP Endpoints
-- `GET /health`
-- `GET /v1/jurisdictions`
-- `GET /v1/rules/registry`
-- `GET /v1/rules/registry/{jurisdiction}`
-- `GET /v1/rules/latest/{jurisdiction}`
-- `GET /v1/rules/{jurisdiction}/{tax_year}`
-- `POST /v1/scenario/calculate`
-- `POST /v1/scenario/optimize`
-
-Jurisdiction path values currently supported:
-- `south-africa`
-- `south_africa`
-- `southafrica`
-- `za`
-
 ## Verification
 Tax baselines are maintained in `jurisdictions/south_africa/mod.rs` and currently source-verified as of `2026-02-21`.

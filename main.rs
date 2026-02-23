@@ -31,9 +31,20 @@ fn resolve_bind_addr() -> String {
     "127.0.0.1:8080".to_string()
 }
 
+fn resolve_database_url() -> Result<String, std::io::Error> {
+    match std::env::var("DATABASE_URL") {
+        Ok(value) if !value.trim().is_empty() => Ok(value),
+        _ => Err(std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            "DATABASE_URL is required (PostgreSQL connection string)",
+        )),
+    }
+}
+
 #[tokio::main]
-async fn main() -> Result<(), std::io::Error> {
+async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let _ = dotenvy::dotenv();
     let bind_addr = resolve_bind_addr();
-    api::run(&bind_addr).await
+    let database_url = resolve_database_url()?;
+    api::run(&bind_addr, &database_url).await
 }
