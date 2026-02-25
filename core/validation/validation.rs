@@ -93,7 +93,11 @@ impl EstateAsset {
             format!("{prefix}.market_value_zar"),
             self.market_value_zar,
         );
-        check_non_negative_finite(issues, format!("{prefix}.base_cost_zar"), self.base_cost_zar);
+        check_non_negative_finite(
+            issues,
+            format!("{prefix}.base_cost_zar"),
+            self.base_cost_zar,
+        );
 
         if self.bequeathed_to_surviving_spouse && self.bequeathed_to_pbo {
             issues.push(ValidationIssue::new(
@@ -102,7 +106,8 @@ impl EstateAsset {
             ));
         }
 
-        if !self.included_in_estate_duty && (self.bequeathed_to_surviving_spouse || self.bequeathed_to_pbo)
+        if !self.included_in_estate_duty
+            && (self.bequeathed_to_surviving_spouse || self.bequeathed_to_pbo)
         {
             issues.push(ValidationIssue::new(
                 format!("{prefix}.included_in_estate_duty"),
@@ -118,7 +123,10 @@ impl EstateAsset {
         }
 
         if self.qualifies_primary_residence_exclusion
-            && matches!(taxpayer_class, TaxPayerClass::Company | TaxPayerClass::Trust)
+            && matches!(
+                taxpayer_class,
+                TaxPayerClass::Company | TaxPayerClass::Trust
+            )
         {
             issues.push(ValidationIssue::new(
                 format!("{prefix}.qualifies_primary_residence_exclusion"),
@@ -145,7 +153,10 @@ impl EstateScenarioInput {
         if !is_supported_tax_year(self.jurisdiction, self.tax_year) {
             issues.push(ValidationIssue::new(
                 "tax_year".to_string(),
-                format!("Tax year {} is not supported for {:?}", self.tax_year, self.jurisdiction),
+                format!(
+                    "Tax year {} is not supported for {:?}",
+                    self.tax_year, self.jurisdiction
+                ),
             ));
         }
 
@@ -239,7 +250,11 @@ impl EstateScenarioInput {
             "external_liquidity_proceeds_zar".to_string(),
             self.external_liquidity_proceeds_zar,
         );
-        check_non_negative_finite(&mut issues, "cash_reserve_zar".to_string(), self.cash_reserve_zar);
+        check_non_negative_finite(
+            &mut issues,
+            "cash_reserve_zar".to_string(),
+            self.cash_reserve_zar,
+        );
 
         if let Some(explicit_executor_fee_zar) = self.explicit_executor_fee_zar {
             check_non_negative_finite(
@@ -249,8 +264,10 @@ impl EstateScenarioInput {
             );
         }
 
-        if matches!(self.taxpayer_class, TaxPayerClass::Company | TaxPayerClass::Trust)
-            && self.primary_residence_cgt_exclusion_cap_zar > 0.0
+        if matches!(
+            self.taxpayer_class,
+            TaxPayerClass::Company | TaxPayerClass::Trust
+        ) && self.primary_residence_cgt_exclusion_cap_zar > 0.0
         {
             issues.push(ValidationIssue::new(
                 "primary_residence_cgt_exclusion_cap_zar".to_string(),
@@ -259,7 +276,12 @@ impl EstateScenarioInput {
         }
 
         for (index, asset) in self.assets.iter().enumerate() {
-            asset.validate_contract(index, self.taxpayer_class, self.residency_status, &mut issues);
+            asset.validate_contract(
+                index,
+                self.taxpayer_class,
+                self.residency_status,
+                &mut issues,
+            );
         }
 
         if issues.is_empty() {

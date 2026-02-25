@@ -69,11 +69,18 @@ impl SouthAfricaScenarioCalculator {
 
         let annual_exclusion_used_zar = match input.taxpayer_class {
             TaxPayerClass::NaturalPerson | TaxPayerClass::SpecialTrust => gross_capital_gain_zar
-                .min(self.rules.cgt_on_death.annual_exclusion_in_year_of_death_zar),
+                .min(
+                    self.rules
+                        .cgt_on_death
+                        .annual_exclusion_in_year_of_death_zar,
+                ),
             TaxPayerClass::Company | TaxPayerClass::Trust => 0.0,
         };
 
-        let inclusion_rate = self.rules.cgt_on_death.inclusion_rate_for(input.taxpayer_class);
+        let inclusion_rate = self
+            .rules
+            .cgt_on_death
+            .inclusion_rate_for(input.taxpayer_class);
         let taxable_capital_gain_in_income_zar =
             (gross_capital_gain_zar - annual_exclusion_used_zar).max(0.0) * inclusion_rate;
         let tax_payable_zar = taxable_capital_gain_in_income_zar * marginal_income_tax_rate;
@@ -118,7 +125,8 @@ impl SouthAfricaScenarioCalculator {
             gross_estate_for_executor_fee_zar * fee_rate * (1.0 + vat_rate)
         });
 
-        let section_4q_spousal_deduction_zar = if self.rules.estate_duty.spouse_deduction_unlimited {
+        let section_4q_spousal_deduction_zar = if self.rules.estate_duty.spouse_deduction_unlimited
+        {
             input
                 .assets
                 .iter()
@@ -162,7 +170,9 @@ impl SouthAfricaScenarioCalculator {
             + executor_fee_zar.max(0.0)
             + section_4q_spousal_deduction_zar
             + pbo_deduction_zar
-            + input.additional_allowable_estate_duty_deductions_zar.max(0.0);
+            + input
+                .additional_allowable_estate_duty_deductions_zar
+                .max(0.0);
 
         let net_estate_before_abatement_zar =
             (gross_estate_for_estate_duty_zar - total_allowable_deductions_zar).max(0.0);
@@ -173,9 +183,9 @@ impl SouthAfricaScenarioCalculator {
 
         let primary_band =
             dutiable_estate_after_abatement_zar.min(self.rules.estate_duty.primary_rate_cap_zar);
-        let secondary_band =
-            (dutiable_estate_after_abatement_zar - self.rules.estate_duty.primary_rate_cap_zar)
-                .max(0.0);
+        let secondary_band = (dutiable_estate_after_abatement_zar
+            - self.rules.estate_duty.primary_rate_cap_zar)
+            .max(0.0);
         let tax_payable_zar = primary_band * self.rules.estate_duty.primary_rate
             + secondary_band * self.rules.estate_duty.secondary_rate;
 
@@ -263,7 +273,8 @@ impl ScenarioCalculator for SouthAfricaScenarioCalculator {
         let estate_duty = self.calculate_estate_duty(input, cgt.tax_payable_zar);
         let combined_tax =
             self.calculate_combined_tax(input, cgt.tax_payable_zar, estate_duty.tax_payable_zar);
-        let liquidity = self.calculate_liquidity(input, &combined_tax, estate_duty.executor_fee_zar);
+        let liquidity =
+            self.calculate_liquidity(input, &combined_tax, estate_duty.executor_fee_zar);
 
         ScenarioResult {
             cgt,

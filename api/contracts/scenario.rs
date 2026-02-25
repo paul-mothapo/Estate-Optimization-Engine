@@ -175,7 +175,11 @@ impl From<EstateScenarioInput> for ApiEstateScenarioInput {
             taxpayer_class: value.taxpayer_class.into(),
             residency_status: value.residency_status.into(),
             marginal_income_tax_rate: value.marginal_income_tax_rate,
-            assets: value.assets.into_iter().map(ApiEstateAssetInput::from).collect(),
+            assets: value
+                .assets
+                .into_iter()
+                .map(ApiEstateAssetInput::from)
+                .collect(),
             debts_and_loans_zar: value.debts_and_loans_zar,
             funeral_costs_zar: value.funeral_costs_zar,
             administration_costs_zar: value.administration_costs_zar,

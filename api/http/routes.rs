@@ -193,7 +193,9 @@ async fn get_registry_for_jurisdiction(
         (status = 400, description = "Invalid jurisdiction", body = ApiErrorResponse)
     )
 )]
-async fn resolve_latest_rules(Path(jurisdiction): Path<String>) -> HttpResult<ApiVersionedJurisdictionTaxRuleSet> {
+async fn resolve_latest_rules(
+    Path(jurisdiction): Path<String>,
+) -> HttpResult<ApiVersionedJurisdictionTaxRuleSet> {
     let jurisdiction = parse_jurisdiction(&jurisdiction).map_err(api_error_to_http)?;
     Ok(Json(resolve_latest_tax_rules_contract(jurisdiction)))
 }

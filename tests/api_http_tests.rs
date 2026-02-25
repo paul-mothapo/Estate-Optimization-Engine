@@ -1,4 +1,6 @@
-use crate::api::contracts::{ApiErrorCode, ApiErrorResponse, ApiEstateScenarioInput, ApiHealthResponse};
+use crate::api::contracts::{
+    ApiErrorCode, ApiErrorResponse, ApiEstateScenarioInput, ApiHealthResponse,
+};
 use crate::api::http::app;
 use crate::core::domain::models::EstateScenarioInput;
 use axum::body::{to_bytes, Body};

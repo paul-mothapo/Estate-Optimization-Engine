@@ -1,7 +1,5 @@
 use crate::jurisdictions::south_africa::{
-    south_africa_latest_tax_rules,
-    south_africa_tax_rules_catalog,
-    south_africa_tax_rules_for_year,
+    south_africa_latest_tax_rules, south_africa_tax_rules_catalog, south_africa_tax_rules_for_year,
 };
 use std::fmt;
 
@@ -161,7 +159,10 @@ pub fn supported_tax_year_window(jurisdiction: Jurisdiction) -> Option<(u16, Opt
     let max_year = if has_open_ended_window {
         None
     } else {
-        versions.iter().filter_map(|version| version.tax_year_to).max()
+        versions
+            .iter()
+            .filter_map(|version| version.tax_year_to)
+            .max()
     };
 
     Some((min_year, max_year))

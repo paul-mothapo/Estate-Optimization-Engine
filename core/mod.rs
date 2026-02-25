@@ -1,8 +1,8 @@
 pub mod domain;
 pub mod engine;
+pub mod errors;
 pub mod rules;
 pub mod validation;
-pub mod errors;
 
 pub use domain::*;
 pub use engine::*;

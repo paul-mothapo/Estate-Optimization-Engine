@@ -1,5 +1,5 @@
-use crate::core::validation::InputValidationError;
 use crate::core::rules::tax_rules::TaxRuleSelectionError;
+use crate::core::validation::InputValidationError;
 use std::fmt;
 
 #[derive(Debug, Clone, PartialEq, Eq)]

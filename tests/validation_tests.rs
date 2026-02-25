@@ -1,6 +1,6 @@
 use crate::api::handler::{calculate_single_scenario, optimize_candidate_scenarios};
-use crate::core::errors::EngineError;
 use crate::core::domain::models::{EstateAsset, EstateScenarioInput, ResidencyStatus};
+use crate::core::errors::EngineError;
 use crate::core::rules::tax_rules::{Jurisdiction, TaxPayerClass};
 
 fn valid_input() -> EstateScenarioInput {

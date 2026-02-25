@@ -1,7 +1,7 @@
 use super::ApiJurisdiction;
 use crate::core::rules::tax_rules::{
-    CapitalGainsAtDeathRule, DonationsTaxRule, EstateDutyRule, Jurisdiction, JurisdictionTaxRuleSet,
-    TaxRuleRegistryEntry, TaxRuleVersion, VersionedJurisdictionTaxRuleSet,
+    CapitalGainsAtDeathRule, DonationsTaxRule, EstateDutyRule, Jurisdiction,
+    JurisdictionTaxRuleSet, TaxRuleRegistryEntry, TaxRuleVersion, VersionedJurisdictionTaxRuleSet,
 };
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
@@ -66,7 +66,11 @@ impl From<JurisdictionTaxRuleRegistryResponse> for ApiJurisdictionTaxRuleRegistr
     fn from(value: JurisdictionTaxRuleRegistryResponse) -> Self {
         ApiJurisdictionTaxRuleRegistryResponse {
             jurisdiction: value.jurisdiction.into(),
-            versions: value.versions.into_iter().map(ApiTaxRuleVersion::from).collect(),
+            versions: value
+                .versions
+                .into_iter()
+                .map(ApiTaxRuleVersion::from)
+                .collect(),
             supported_tax_year_from: value.supported_tax_year_from,
             supported_tax_year_to: value.supported_tax_year_to,
             latest_version_id: value.latest_version_id.to_string(),
@@ -148,7 +152,8 @@ impl From<CapitalGainsAtDeathRule> for ApiCapitalGainsAtDeathRule {
             inclusion_rate_natural_person: value.inclusion_rate_natural_person,
             inclusion_rate_company: value.inclusion_rate_company,
             inclusion_rate_trust: value.inclusion_rate_trust,
-            base_cost_step_up_to_market_value_on_death: value.base_cost_step_up_to_market_value_on_death,
+            base_cost_step_up_to_market_value_on_death: value
+                .base_cost_step_up_to_market_value_on_death,
             effective_from: value.effective_from.to_string(),
             source: value.source.to_string(),
             source_url: value.source_url.to_string(),

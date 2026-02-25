@@ -4,10 +4,10 @@ use crate::api::contracts::{
     ApiTaxRuleRegistryEntry, ApiValidationIssue, ApiVersionedJurisdictionTaxRuleSet,
     JurisdictionTaxRuleRegistryResponse,
 };
-use crate::core::errors::EngineError;
 use crate::core::domain::models::{EstateScenarioInput, ScenarioResult};
 use crate::core::engine::optimizer::{optimize_scenarios, OptimizedScenario};
 use crate::core::engine::scenario::calculate_combined_tax_and_liquidity;
+use crate::core::errors::EngineError;
 use crate::core::rules::tax_rules::{
     latest_tax_rules_for, supported_jurisdictions, supported_tax_year_window, tax_rule_registry,
     tax_rule_registry_for, tax_rules_for, Jurisdiction, TaxRuleRegistryEntry,
@@ -154,7 +154,9 @@ pub fn resolve_tax_rules_for_year_api(
     resolve_tax_rules_for_year(jurisdiction, tax_year).map_err(to_api_error_response)
 }
 
-pub fn calculate_single_scenario(input: &EstateScenarioInput) -> Result<ScenarioResult, EngineError> {
+pub fn calculate_single_scenario(
+    input: &EstateScenarioInput,
+) -> Result<ScenarioResult, EngineError> {
     input.validate().map_err(EngineError::from)?;
     calculate_combined_tax_and_liquidity(input).map_err(EngineError::from)
 }
@@ -172,7 +174,9 @@ pub fn optimize_candidate_scenarios(
         }
     }
     if !all_issues.is_empty() {
-        return Err(EngineError::Validation(InputValidationError::new(all_issues)));
+        return Err(EngineError::Validation(InputValidationError::new(
+            all_issues,
+        )));
     }
     optimize_scenarios(candidates).map_err(EngineError::from)
 }
