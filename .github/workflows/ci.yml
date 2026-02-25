@@ -7,6 +7,10 @@ on:
     branches: ["master"]
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   checks:
     name: Build, Lint, Test
@@ -30,13 +34,11 @@ jobs:
       - name: Cargo check
         run: cargo check --all-targets
 
-      # Disabled to reduce CI minutes.
-      # - name: Cargo clippy (deny warnings)
-      #   run: cargo clippy --all-targets -- -D warnings
+      - name: Cargo clippy (deny warnings)
+        run: cargo clippy --all-targets -- -D warnings
 
       - name: Cargo test
         run: cargo test
 
-      # Disabled to reduce CI minutes.
-      # - name: Cargo build (release)
-      #   run: cargo build --release
+      - name: Cargo build (release)
+        run: cargo build --release
