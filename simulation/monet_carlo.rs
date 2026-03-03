@@ -23,9 +23,9 @@ pub fn run_liquidity_stress_grid(
             let applied_liquid_haircut = (1.0 - haircut).clamp(0.0, 1.0);
 
             for asset in &mut shocked_input.assets {
-                asset.market_value_zar = (asset.market_value_zar * applied_shock).max(0.0);
+                asset.market_value_amount = (asset.market_value_amount * applied_shock).max(0.0);
                 if asset.is_liquid {
-                    asset.market_value_zar *= applied_liquid_haircut;
+                    asset.market_value_amount *= applied_liquid_haircut;
                 }
             }
 
