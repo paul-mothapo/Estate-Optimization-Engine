@@ -8,7 +8,17 @@ use crate::api::handler::{
 #[test]
 fn contract_lists_supported_jurisdictions() {
     let jurisdictions = list_supported_jurisdictions_contract();
-    assert_eq!(jurisdictions, vec![ApiJurisdiction::SouthAfrica]);
+    assert_eq!(
+        jurisdictions,
+        vec![
+            ApiJurisdiction::SouthAfrica,
+            ApiJurisdiction::UsNewYork,
+            ApiJurisdiction::UsTexas,
+            ApiJurisdiction::UsCalifornia,
+            ApiJurisdiction::UsFlorida,
+            ApiJurisdiction::UsMinnesota,
+        ]
+    );
 }
 
 #[test]
@@ -18,6 +28,21 @@ fn contract_lists_registry_entries() {
         entry.jurisdiction == ApiJurisdiction::SouthAfrica
             && entry.version.version_id == "ZA-ESTATE-BASELINE-2018+"
     }));
+    assert!(entries
+        .iter()
+        .any(|entry| entry.jurisdiction == ApiJurisdiction::UsNewYork));
+    assert!(entries
+        .iter()
+        .any(|entry| entry.jurisdiction == ApiJurisdiction::UsTexas));
+    assert!(entries
+        .iter()
+        .any(|entry| entry.jurisdiction == ApiJurisdiction::UsCalifornia));
+    assert!(entries
+        .iter()
+        .any(|entry| entry.jurisdiction == ApiJurisdiction::UsFlorida));
+    assert!(entries
+        .iter()
+        .any(|entry| entry.jurisdiction == ApiJurisdiction::UsMinnesota));
 }
 
 #[test]
@@ -54,4 +79,18 @@ fn contract_rejects_unsupported_year() {
 fn contract_resolves_latest_rules() {
     let latest = resolve_latest_tax_rules_contract(ApiJurisdiction::SouthAfrica);
     assert_eq!(latest.version.version_id, "ZA-ESTATE-BASELINE-2018+");
+}
+
+#[test]
+fn contract_resolves_latest_rules_for_us_state() {
+    let latest = resolve_latest_tax_rules_contract(ApiJurisdiction::UsTexas);
+    assert_eq!(latest.version.version_id, "US-TX-ESTATE-BASELINE-2026+");
+}
+
+#[test]
+fn contract_rejects_unsupported_year_for_us_state() {
+    let err = resolve_tax_rules_for_year_contract(ApiJurisdiction::UsTexas, 2025)
+        .expect_err("Expected US baseline to reject years before 2026");
+    assert_eq!(err.code, ApiErrorCode::RuleSelection);
+    assert!(err.message.contains("2025"));
 }

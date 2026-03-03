@@ -17,11 +17,15 @@ pub struct ScenarioScore {
 }
 
 pub fn score_scenario(result: &ScenarioResult) -> ScenarioScore {
-    let gross_estate = result.estate_duty.gross_estate_for_estate_duty_zar.max(1.0);
-    let required_liquidity = result.liquidity.immediate_cash_requirements_zar.max(1.0);
+    let gross_estate = result
+        .estate_duty
+        .gross_estate_for_transfer_tax_amount
+        .max(1.0);
+    let required_liquidity = result.liquidity.immediate_cash_requirements_amount.max(1.0);
 
-    let tax_burden_ratio = result.combined_tax.total_tax_liability_zar / gross_estate;
-    let liquidity_cover_ratio = result.liquidity.total_available_liquidity_zar / required_liquidity;
+    let tax_burden_ratio = result.combined_tax.total_tax_liability_amount / gross_estate;
+    let liquidity_cover_ratio =
+        result.liquidity.total_available_liquidity_amount / required_liquidity;
 
     let liquidity_risk_band = if liquidity_cover_ratio >= 1.20 {
         LiquidityRiskBand::Low

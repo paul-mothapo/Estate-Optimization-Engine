@@ -27,10 +27,10 @@ pub struct SouthAfricaTaxSummary {
     pub rates_last_verified_on: &'static str,
     pub estate_duty_rate_main: f64,
     pub estate_duty_rate_above_30m: f64,
-    pub estate_duty_section_4a_abatement_zar: f64,
+    pub estate_duty_exemption_amount: f64,
     pub donations_tax_rate_main: f64,
     pub donations_tax_rate_above_30m: f64,
-    pub cgt_annual_exclusion_year_of_death_zar: f64,
+    pub cgt_annual_exclusion_year_of_death_amount: f64,
 }
 
 fn summarize_tax_rules(rules: &JurisdictionTaxRuleSet) -> SouthAfricaTaxSummary {
@@ -39,12 +39,12 @@ fn summarize_tax_rules(rules: &JurisdictionTaxRuleSet) -> SouthAfricaTaxSummary 
         rates_last_verified_on: "2026-02-21",
         estate_duty_rate_main: rules.estate_duty.primary_rate,
         estate_duty_rate_above_30m: rules.estate_duty.secondary_rate,
-        estate_duty_section_4a_abatement_zar: rules.estate_duty.section_4a_abatement_zar,
+        estate_duty_exemption_amount: rules.estate_duty.exemption_amount,
         donations_tax_rate_main: rules.donations_tax.primary_rate,
         donations_tax_rate_above_30m: rules.donations_tax.secondary_rate,
-        cgt_annual_exclusion_year_of_death_zar: rules
+        cgt_annual_exclusion_year_of_death_amount: rules
             .cgt_on_death
-            .annual_exclusion_in_year_of_death_zar,
+            .annual_exclusion_in_year_of_death_amount,
     }
 }
 
@@ -60,9 +60,9 @@ fn south_africa_tax_rules_2018_onwards() -> VersionedJurisdictionTaxRuleSet {
         },
         rules: JurisdictionTaxRuleSet {
             estate_duty: EstateDutyRule {
-                section_4a_abatement_zar: 3_500_000.0,
+                exemption_amount: 3_500_000.0,
                 primary_rate: 0.20,
-                primary_rate_cap_zar: 30_000_000.0,
+                primary_rate_cap_amount: 30_000_000.0,
                 secondary_rate: 0.25,
                 spouse_deduction_unlimited: true, // Estate Duty Act, section 4(q)
                 effective_from: "2018-03-01",
@@ -70,17 +70,17 @@ fn south_africa_tax_rules_2018_onwards() -> VersionedJurisdictionTaxRuleSet {
                 source_url: "https://www.sars.gov.za/types-of-tax/estate-duty/",
             },
             donations_tax: DonationsTaxRule {
-                annual_exemption_natural_person_zar: 100_000.0,
-                annual_exemption_non_natural_casual_gifts_zar: 10_000.0,
+                annual_exemption_natural_person_amount: 100_000.0,
+                annual_exemption_non_natural_casual_gifts_amount: 10_000.0,
                 primary_rate: 0.20,
-                primary_rate_cap_cumulative_zar: 30_000_000.0,
+                primary_rate_cap_cumulative_amount: 30_000_000.0,
                 secondary_rate: 0.25,
                 effective_from: "2018-03-01",
                 source: "SARS Donations Tax (accessed 2026-02-21)",
                 source_url: "https://www.sars.gov.za/types-of-tax/donations-tax/",
             },
             cgt_on_death: CapitalGainsAtDeathRule {
-                annual_exclusion_in_year_of_death_zar: 300_000.0,
+                annual_exclusion_in_year_of_death_amount: 300_000.0,
                 inclusion_rate_natural_person: 0.40,
                 inclusion_rate_company: 0.80,
                 inclusion_rate_trust: 0.80,

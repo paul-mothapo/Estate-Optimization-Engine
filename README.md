@@ -1,10 +1,14 @@
 # Estate Optimization Engine
 
-South Africa estate-planning engine with:
+Jurisdiction-aware estate-planning engine with:
 - Combined Tax Liability calculation
 - Liquidity Gap output
 - Tax-rule version registry
 - HTTP API (Cargo + Axum)
+
+Current jurisdiction baselines:
+- South Africa
+- United States (state baselines: New York, Texas, California, Florida, Minnesota)
 
 ## Stack
 - Rust 2021
@@ -32,4 +36,6 @@ cargo check --all-targets
 ```
 
 ## Verification
-Tax baselines are maintained in `jurisdictions/south_africa/mod.rs` and currently source-verified as of `2026-02-21`.
+Tax baselines are maintained in:
+- `jurisdictions/south_africa/mod.rs`
+- `jurisdictions/us/mod.rs`

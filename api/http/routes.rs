@@ -266,12 +266,33 @@ async fn optimize_scenarios(
 fn parse_jurisdiction(raw: &str) -> Result<ApiJurisdiction, ApiErrorResponse> {
     match raw.to_ascii_lowercase().as_str() {
         "south-africa" | "south_africa" | "southafrica" | "za" => Ok(ApiJurisdiction::SouthAfrica),
+        "us-new-york"
+        | "us_new_york"
+        | "usnewyork"
+        | "new-york"
+        | "new_york"
+        | "newyork"
+        | "newyoork"
+        | "ny" => Ok(ApiJurisdiction::UsNewYork),
+        "us-texas" | "us_texas" | "ustexas" | "texas" | "tx" => Ok(ApiJurisdiction::UsTexas),
+        "us-california"
+        | "us_california"
+        | "uscalifornia"
+        | "california"
+        | "calfornia"
+        | "ca" => Ok(ApiJurisdiction::UsCalifornia),
+        "us-florida" | "us_florida" | "usflorida" | "florida" | "fl" => {
+            Ok(ApiJurisdiction::UsFlorida)
+        }
+        "us-minnesota" | "us_minnesota" | "usminnesota" | "minnesota" | "mn" => {
+            Ok(ApiJurisdiction::UsMinnesota)
+        }
         _ => Err(ApiErrorResponse {
             code: ApiErrorCode::Validation,
             message: format!("Unsupported jurisdiction path value '{raw}'"),
             validation_issues: vec![ApiValidationIssue {
                 field: "jurisdiction".to_string(),
-                message: "Use one of: south-africa, south_africa, southafrica, za".to_string(),
+                message: "Use one of: south-africa|za, us-new-york|new-york|newyoork|ny, us-texas|texas|tx, us-california|california|calfornia|ca, us-florida|florida|fl, us-minnesota|minnesota|mn".to_string(),
             }],
         }),
     }

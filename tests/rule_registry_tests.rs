@@ -15,7 +15,17 @@ fn registry_exposes_south_africa_versions() {
 #[test]
 fn supported_jurisdictions_contains_south_africa() {
     let jurisdictions = supported_jurisdictions();
-    assert_eq!(jurisdictions, vec![Jurisdiction::SouthAfrica]);
+    assert_eq!(
+        jurisdictions,
+        vec![
+            Jurisdiction::SouthAfrica,
+            Jurisdiction::UsNewYork,
+            Jurisdiction::UsTexas,
+            Jurisdiction::UsCalifornia,
+            Jurisdiction::UsFlorida,
+            Jurisdiction::UsMinnesota,
+        ]
+    );
 }
 
 #[test]
@@ -32,4 +42,19 @@ fn latest_rule_version_is_present_in_registry() {
         entry.jurisdiction == Jurisdiction::SouthAfrica
             && entry.version.version_id == latest.version.version_id
     }));
+}
+
+#[test]
+fn tax_year_window_is_available_for_us_state() {
+    let window = supported_tax_year_window(Jurisdiction::UsCalifornia);
+    assert_eq!(window, Some((2026, None)));
+}
+
+#[test]
+fn registry_exposes_us_state_versions() {
+    let versions = tax_rule_registry_for(Jurisdiction::UsCalifornia);
+    assert!(!versions.is_empty());
+    assert!(versions
+        .iter()
+        .any(|version| version.version_id == "US-CA-ESTATE-BASELINE-2026+"));
 }

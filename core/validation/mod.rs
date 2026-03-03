@@ -90,13 +90,13 @@ impl EstateAsset {
 
         check_non_negative_finite(
             issues,
-            format!("{prefix}.market_value_zar"),
-            self.market_value_zar,
+            format!("{prefix}.market_value_amount"),
+            self.market_value_amount,
         );
         check_non_negative_finite(
             issues,
-            format!("{prefix}.base_cost_zar"),
-            self.base_cost_zar,
+            format!("{prefix}.base_cost_amount"),
+            self.base_cost_amount,
         );
 
         if self.bequeathed_to_surviving_spouse && self.bequeathed_to_pbo {
@@ -136,11 +136,11 @@ impl EstateAsset {
 
         if matches!(residency_status, ResidencyStatus::NonResident)
             && self.included_in_estate_duty
-            && !self.situs_in_south_africa
+            && !self.situs_in_jurisdiction
         {
             issues.push(ValidationIssue::new(
-                format!("{prefix}.situs_in_south_africa"),
-                "Non-resident estate duty scope requires SA situs for included assets",
+                format!("{prefix}.situs_in_jurisdiction"),
+                "Non-resident estate duty scope requires asset situs in the selected jurisdiction",
             ));
         }
     }
@@ -170,11 +170,11 @@ impl EstateScenarioInput {
         let assets_with_positive_value = self
             .assets
             .iter()
-            .any(|asset| asset.market_value_zar.is_finite() && asset.market_value_zar > 0.0);
+            .any(|asset| asset.market_value_amount.is_finite() && asset.market_value_amount > 0.0);
         if !self.assets.is_empty() && !assets_with_positive_value {
             issues.push(ValidationIssue::new(
                 "assets".to_string(),
-                "At least one asset must have `market_value_zar > 0`",
+                "At least one asset must have `market_value_amount > 0`",
             ));
         }
 
@@ -192,85 +192,85 @@ impl EstateScenarioInput {
 
         check_non_negative_finite(
             &mut issues,
-            "debts_and_loans_zar".to_string(),
-            self.debts_and_loans_zar,
+            "debts_and_loans_amount".to_string(),
+            self.debts_and_loans_amount,
         );
         check_non_negative_finite(
             &mut issues,
-            "funeral_costs_zar".to_string(),
-            self.funeral_costs_zar,
+            "funeral_costs_amount".to_string(),
+            self.funeral_costs_amount,
         );
         check_non_negative_finite(
             &mut issues,
-            "administration_costs_zar".to_string(),
-            self.administration_costs_zar,
+            "administration_costs_amount".to_string(),
+            self.administration_costs_amount,
         );
         check_non_negative_finite(
             &mut issues,
-            "masters_office_fees_zar".to_string(),
-            self.masters_office_fees_zar,
+            "masters_office_fees_amount".to_string(),
+            self.masters_office_fees_amount,
         );
         check_non_negative_finite(
             &mut issues,
-            "conveyancing_costs_zar".to_string(),
-            self.conveyancing_costs_zar,
+            "conveyancing_costs_amount".to_string(),
+            self.conveyancing_costs_amount,
         );
         check_non_negative_finite(
             &mut issues,
-            "other_settlement_costs_zar".to_string(),
-            self.other_settlement_costs_zar,
+            "other_settlement_costs_amount".to_string(),
+            self.other_settlement_costs_amount,
         );
         check_non_negative_finite(
             &mut issues,
-            "final_income_tax_due_zar".to_string(),
-            self.final_income_tax_due_zar,
+            "final_income_tax_due_amount".to_string(),
+            self.final_income_tax_due_amount,
         );
         check_non_negative_finite(
             &mut issues,
-            "ongoing_estate_income_tax_provision_zar".to_string(),
-            self.ongoing_estate_income_tax_provision_zar,
+            "ongoing_estate_income_tax_provision_amount".to_string(),
+            self.ongoing_estate_income_tax_provision_amount,
         );
         check_non_negative_finite(
             &mut issues,
-            "additional_allowable_estate_duty_deductions_zar".to_string(),
-            self.additional_allowable_estate_duty_deductions_zar,
+            "additional_allowable_estate_transfer_tax_deductions_amount".to_string(),
+            self.additional_allowable_estate_transfer_tax_deductions_amount,
         );
         check_non_negative_finite(
             &mut issues,
-            "ported_section_4a_abatement_zar".to_string(),
-            self.ported_section_4a_abatement_zar,
+            "ported_estate_tax_exemption_amount".to_string(),
+            self.ported_estate_tax_exemption_amount,
         );
         check_non_negative_finite(
             &mut issues,
-            "primary_residence_cgt_exclusion_cap_zar".to_string(),
-            self.primary_residence_cgt_exclusion_cap_zar,
+            "primary_residence_cgt_exclusion_cap_amount".to_string(),
+            self.primary_residence_cgt_exclusion_cap_amount,
         );
         check_non_negative_finite(
             &mut issues,
-            "external_liquidity_proceeds_zar".to_string(),
-            self.external_liquidity_proceeds_zar,
+            "external_liquidity_proceeds_amount".to_string(),
+            self.external_liquidity_proceeds_amount,
         );
         check_non_negative_finite(
             &mut issues,
-            "cash_reserve_zar".to_string(),
-            self.cash_reserve_zar,
+            "cash_reserve_amount".to_string(),
+            self.cash_reserve_amount,
         );
 
-        if let Some(explicit_executor_fee_zar) = self.explicit_executor_fee_zar {
+        if let Some(explicit_executor_fee_amount) = self.explicit_executor_fee_amount {
             check_non_negative_finite(
                 &mut issues,
-                "explicit_executor_fee_zar".to_string(),
-                explicit_executor_fee_zar,
+                "explicit_executor_fee_amount".to_string(),
+                explicit_executor_fee_amount,
             );
         }
 
         if matches!(
             self.taxpayer_class,
             TaxPayerClass::Company | TaxPayerClass::Trust
-        ) && self.primary_residence_cgt_exclusion_cap_zar > 0.0
+        ) && self.primary_residence_cgt_exclusion_cap_amount > 0.0
         {
             issues.push(ValidationIssue::new(
-                "primary_residence_cgt_exclusion_cap_zar".to_string(),
+                "primary_residence_cgt_exclusion_cap_amount".to_string(),
                 "Set to 0 for company/trust taxpayer class",
             ));
         }

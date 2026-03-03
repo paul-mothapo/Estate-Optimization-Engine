@@ -1,6 +1,9 @@
 use crate::jurisdictions::south_africa::{
     south_africa_latest_tax_rules, south_africa_tax_rules_catalog, south_africa_tax_rules_for_year,
 };
+use crate::jurisdictions::us::{
+    us_state_latest_tax_rules, us_state_tax_rules_catalog, us_state_tax_rules_for_year,
+};
 use std::fmt;
 
 // Country rates/thresholds are owned by jurisdiction modules.
@@ -17,6 +20,11 @@ pub enum TaxPayerClass {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Jurisdiction {
     SouthAfrica,
+    UsNewYork,
+    UsTexas,
+    UsCalifornia,
+    UsFlorida,
+    UsMinnesota,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -31,9 +39,9 @@ pub struct TaxRuleVersion {
 
 #[derive(Debug, Clone)]
 pub struct EstateDutyRule {
-    pub section_4a_abatement_zar: f64,
+    pub exemption_amount: f64,
     pub primary_rate: f64,
-    pub primary_rate_cap_zar: f64,
+    pub primary_rate_cap_amount: f64,
     pub secondary_rate: f64,
     pub spouse_deduction_unlimited: bool,
     pub effective_from: &'static str,
@@ -43,10 +51,10 @@ pub struct EstateDutyRule {
 
 #[derive(Debug, Clone)]
 pub struct DonationsTaxRule {
-    pub annual_exemption_natural_person_zar: f64,
-    pub annual_exemption_non_natural_casual_gifts_zar: f64,
+    pub annual_exemption_natural_person_amount: f64,
+    pub annual_exemption_non_natural_casual_gifts_amount: f64,
     pub primary_rate: f64,
-    pub primary_rate_cap_cumulative_zar: f64,
+    pub primary_rate_cap_cumulative_amount: f64,
     pub secondary_rate: f64,
     pub effective_from: &'static str,
     pub source: &'static str,
@@ -55,7 +63,7 @@ pub struct DonationsTaxRule {
 
 #[derive(Debug, Clone)]
 pub struct CapitalGainsAtDeathRule {
-    pub annual_exclusion_in_year_of_death_zar: f64,
+    pub annual_exclusion_in_year_of_death_amount: f64,
     pub inclusion_rate_natural_person: f64,
     pub inclusion_rate_company: f64,
     pub inclusion_rate_trust: f64,
@@ -122,12 +130,27 @@ impl fmt::Display for TaxRuleSelectionError {
 impl std::error::Error for TaxRuleSelectionError {}
 
 pub fn supported_jurisdictions() -> Vec<Jurisdiction> {
-    vec![Jurisdiction::SouthAfrica]
+    vec![
+        Jurisdiction::SouthAfrica,
+        Jurisdiction::UsNewYork,
+        Jurisdiction::UsTexas,
+        Jurisdiction::UsCalifornia,
+        Jurisdiction::UsFlorida,
+        Jurisdiction::UsMinnesota,
+    ]
 }
 
 pub fn tax_rule_registry_for(jurisdiction: Jurisdiction) -> Vec<TaxRuleVersion> {
     match jurisdiction {
         Jurisdiction::SouthAfrica => south_africa_tax_rules_catalog()
+            .into_iter()
+            .map(|versioned| versioned.version)
+            .collect(),
+        Jurisdiction::UsNewYork
+        | Jurisdiction::UsTexas
+        | Jurisdiction::UsCalifornia
+        | Jurisdiction::UsFlorida
+        | Jurisdiction::UsMinnesota => us_state_tax_rules_catalog(jurisdiction)
             .into_iter()
             .map(|versioned| versioned.version)
             .collect(),
@@ -174,12 +197,22 @@ pub fn tax_rules_for(
 ) -> Result<VersionedJurisdictionTaxRuleSet, TaxRuleSelectionError> {
     match jurisdiction {
         Jurisdiction::SouthAfrica => south_africa_tax_rules_for_year(tax_year),
+        Jurisdiction::UsNewYork
+        | Jurisdiction::UsTexas
+        | Jurisdiction::UsCalifornia
+        | Jurisdiction::UsFlorida
+        | Jurisdiction::UsMinnesota => us_state_tax_rules_for_year(jurisdiction, tax_year),
     }
 }
 
 pub fn latest_tax_rules_for(jurisdiction: Jurisdiction) -> VersionedJurisdictionTaxRuleSet {
     match jurisdiction {
         Jurisdiction::SouthAfrica => south_africa_latest_tax_rules(),
+        Jurisdiction::UsNewYork
+        | Jurisdiction::UsTexas
+        | Jurisdiction::UsCalifornia
+        | Jurisdiction::UsFlorida
+        | Jurisdiction::UsMinnesota => us_state_latest_tax_rules(jurisdiction),
     }
 }
 

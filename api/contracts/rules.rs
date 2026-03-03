@@ -80,9 +80,11 @@ impl From<JurisdictionTaxRuleRegistryResponse> for ApiJurisdictionTaxRuleRegistr
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, ToSchema)]
 pub struct ApiEstateDutyRule {
-    pub section_4a_abatement_zar: f64,
+    #[serde(alias = "section_4a_abatement_zar")]
+    pub exemption_amount: f64,
     pub primary_rate: f64,
-    pub primary_rate_cap_zar: f64,
+    #[serde(alias = "primary_rate_cap_zar")]
+    pub primary_rate_cap_amount: f64,
     pub secondary_rate: f64,
     pub spouse_deduction_unlimited: bool,
     pub effective_from: String,
@@ -93,9 +95,9 @@ pub struct ApiEstateDutyRule {
 impl From<EstateDutyRule> for ApiEstateDutyRule {
     fn from(value: EstateDutyRule) -> Self {
         ApiEstateDutyRule {
-            section_4a_abatement_zar: value.section_4a_abatement_zar,
+            exemption_amount: value.exemption_amount,
             primary_rate: value.primary_rate,
-            primary_rate_cap_zar: value.primary_rate_cap_zar,
+            primary_rate_cap_amount: value.primary_rate_cap_amount,
             secondary_rate: value.secondary_rate,
             spouse_deduction_unlimited: value.spouse_deduction_unlimited,
             effective_from: value.effective_from.to_string(),
@@ -107,10 +109,13 @@ impl From<EstateDutyRule> for ApiEstateDutyRule {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, ToSchema)]
 pub struct ApiDonationsTaxRule {
-    pub annual_exemption_natural_person_zar: f64,
-    pub annual_exemption_non_natural_casual_gifts_zar: f64,
+    #[serde(alias = "annual_exemption_natural_person_zar")]
+    pub annual_exemption_natural_person_amount: f64,
+    #[serde(alias = "annual_exemption_non_natural_casual_gifts_zar")]
+    pub annual_exemption_non_natural_casual_gifts_amount: f64,
     pub primary_rate: f64,
-    pub primary_rate_cap_cumulative_zar: f64,
+    #[serde(alias = "primary_rate_cap_cumulative_zar")]
+    pub primary_rate_cap_cumulative_amount: f64,
     pub secondary_rate: f64,
     pub effective_from: String,
     pub source: String,
@@ -120,11 +125,11 @@ pub struct ApiDonationsTaxRule {
 impl From<DonationsTaxRule> for ApiDonationsTaxRule {
     fn from(value: DonationsTaxRule) -> Self {
         ApiDonationsTaxRule {
-            annual_exemption_natural_person_zar: value.annual_exemption_natural_person_zar,
-            annual_exemption_non_natural_casual_gifts_zar: value
-                .annual_exemption_non_natural_casual_gifts_zar,
+            annual_exemption_natural_person_amount: value.annual_exemption_natural_person_amount,
+            annual_exemption_non_natural_casual_gifts_amount: value
+                .annual_exemption_non_natural_casual_gifts_amount,
             primary_rate: value.primary_rate,
-            primary_rate_cap_cumulative_zar: value.primary_rate_cap_cumulative_zar,
+            primary_rate_cap_cumulative_amount: value.primary_rate_cap_cumulative_amount,
             secondary_rate: value.secondary_rate,
             effective_from: value.effective_from.to_string(),
             source: value.source.to_string(),
@@ -135,7 +140,8 @@ impl From<DonationsTaxRule> for ApiDonationsTaxRule {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, ToSchema)]
 pub struct ApiCapitalGainsAtDeathRule {
-    pub annual_exclusion_in_year_of_death_zar: f64,
+    #[serde(alias = "annual_exclusion_in_year_of_death_zar")]
+    pub annual_exclusion_in_year_of_death_amount: f64,
     pub inclusion_rate_natural_person: f64,
     pub inclusion_rate_company: f64,
     pub inclusion_rate_trust: f64,
@@ -148,7 +154,8 @@ pub struct ApiCapitalGainsAtDeathRule {
 impl From<CapitalGainsAtDeathRule> for ApiCapitalGainsAtDeathRule {
     fn from(value: CapitalGainsAtDeathRule) -> Self {
         ApiCapitalGainsAtDeathRule {
-            annual_exclusion_in_year_of_death_zar: value.annual_exclusion_in_year_of_death_zar,
+            annual_exclusion_in_year_of_death_amount: value
+                .annual_exclusion_in_year_of_death_amount,
             inclusion_rate_natural_person: value.inclusion_rate_natural_person,
             inclusion_rate_company: value.inclusion_rate_company,
             inclusion_rate_trust: value.inclusion_rate_trust,

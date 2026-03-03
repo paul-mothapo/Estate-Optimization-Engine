@@ -31,3 +31,27 @@ fn api_resolves_latest_tax_rules() {
     let latest = resolve_latest_tax_rules(Jurisdiction::SouthAfrica);
     assert_eq!(latest.version.version_id, "ZA-ESTATE-BASELINE-2018+");
 }
+
+#[test]
+fn api_resolves_us_state_rules_for_supported_year() {
+    let selected = resolve_tax_rules_for_year(Jurisdiction::UsNewYork, 2026)
+        .expect("Expected US New York supported year to resolve");
+
+    assert_eq!(selected.version.version_id, "US-NY-ESTATE-BASELINE-2026+");
+    assert_eq!(selected.version.tax_year_from, 2026);
+    assert_eq!(selected.version.tax_year_to, None);
+}
+
+#[test]
+fn api_rejects_us_state_unsupported_tax_year() {
+    let err = resolve_tax_rules_for_year(Jurisdiction::UsNewYork, 2025)
+        .expect_err("Expected unsupported tax year to fail for US state");
+
+    let EngineError::RuleSelection(selection_error) = err else {
+        panic!("Expected rule selection error");
+    };
+
+    let rendered = selection_error.to_string();
+    assert!(rendered.contains("UsNewYork"));
+    assert!(rendered.contains("2025"));
+}

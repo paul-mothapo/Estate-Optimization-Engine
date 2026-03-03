@@ -9,17 +9,17 @@ fn valid_contract_input() -> ApiEstateScenarioInput {
     let mut input = ApiEstateScenarioInput::from(EstateScenarioInput::default());
     input.assets = vec![ApiEstateAssetInput {
         name: "Contract Asset".to_string(),
-        market_value_zar: 1_000_000.0,
-        base_cost_zar: 700_000.0,
+        market_value_amount: 1_000_000.0,
+        base_cost_amount: 700_000.0,
         is_liquid: true,
-        situs_in_south_africa: true,
+        situs_in_jurisdiction: true,
         included_in_estate_duty: true,
         included_in_cgt_deemed_disposal: true,
         bequeathed_to_surviving_spouse: false,
         bequeathed_to_pbo: false,
         qualifies_primary_residence_exclusion: false,
     }];
-    input.explicit_executor_fee_zar = Some(0.0);
+    input.explicit_executor_fee_amount = Some(0.0);
     input
 }
 
@@ -40,8 +40,8 @@ fn calculate_single_scenario_contract_returns_api_result() {
     let result = calculate_single_scenario_contract(input)
         .expect("Expected contract scenario calculation to succeed");
 
-    assert!(result.combined_tax.total_tax_liability_zar >= 0.0);
-    assert!(result.liquidity.total_available_liquidity_zar >= 0.0);
+    assert!(result.combined_tax.total_tax_liability_amount >= 0.0);
+    assert!(result.liquidity.total_available_liquidity_amount >= 0.0);
 }
 
 #[test]

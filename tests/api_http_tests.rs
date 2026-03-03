@@ -102,6 +102,36 @@ async fn rules_endpoint_returns_rule_selection_error_for_unsupported_year() {
 }
 
 #[tokio::test]
+async fn rules_endpoint_accepts_newyoork_alias() {
+    let response = app()
+        .oneshot(
+            Request::builder()
+                .uri("/v1/rules/newyoork/2026")
+                .body(Body::empty())
+                .expect("Failed to build request"),
+        )
+        .await
+        .expect("Route call failed");
+
+    assert_eq!(response.status(), StatusCode::OK);
+}
+
+#[tokio::test]
+async fn rules_endpoint_accepts_calfornia_alias() {
+    let response = app()
+        .oneshot(
+            Request::builder()
+                .uri("/v1/rules/calfornia/2026")
+                .body(Body::empty())
+                .expect("Failed to build request"),
+        )
+        .await
+        .expect("Route call failed");
+
+    assert_eq!(response.status(), StatusCode::OK);
+}
+
+#[tokio::test]
 async fn openapi_endpoint_returns_spec() {
     let response = app()
         .oneshot(

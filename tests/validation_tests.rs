@@ -11,17 +11,17 @@ fn valid_input() -> EstateScenarioInput {
         marginal_income_tax_rate: 0.45,
         assets: vec![EstateAsset {
             name: "Test Asset".to_string(),
-            market_value_zar: 1_000_000.0,
-            base_cost_zar: 700_000.0,
+            market_value_amount: 1_000_000.0,
+            base_cost_amount: 700_000.0,
             is_liquid: true,
-            situs_in_south_africa: true,
+            situs_in_jurisdiction: true,
             included_in_estate_duty: true,
             included_in_cgt_deemed_disposal: true,
             bequeathed_to_surviving_spouse: false,
             bequeathed_to_pbo: false,
             qualifies_primary_residence_exclusion: false,
         }],
-        explicit_executor_fee_zar: Some(0.0),
+        explicit_executor_fee_amount: Some(0.0),
         ..EstateScenarioInput::default()
     }
 }
@@ -62,15 +62,15 @@ fn rejects_unsupported_tax_year() {
 #[test]
 fn rejects_negative_amounts() {
     let mut input = valid_input();
-    input.funeral_costs_zar = -10.0;
-    input.assets[0].market_value_zar = -100.0;
+    input.funeral_costs_amount = -10.0;
+    input.assets[0].market_value_amount = -100.0;
 
     let err = input.validate().expect_err("Expected validation to fail");
-    assert!(err.issues.iter().any(|i| i.field == "funeral_costs_zar"));
+    assert!(err.issues.iter().any(|i| i.field == "funeral_costs_amount"));
     assert!(err
         .issues
         .iter()
-        .any(|i| i.field == "assets[0].market_value_zar"));
+        .any(|i| i.field == "assets[0].market_value_amount"));
 }
 
 #[test]
@@ -132,14 +132,14 @@ fn rejects_primary_residence_flag_without_cgt_inclusion() {
 fn rejects_primary_residence_exclusion_for_company() {
     let mut input = valid_input();
     input.taxpayer_class = TaxPayerClass::Company;
-    input.primary_residence_cgt_exclusion_cap_zar = 2_000_000.0;
+    input.primary_residence_cgt_exclusion_cap_amount = 2_000_000.0;
     input.assets[0].qualifies_primary_residence_exclusion = true;
 
     let err = input.validate().expect_err("Expected validation to fail");
     assert!(err
         .issues
         .iter()
-        .any(|i| i.field == "primary_residence_cgt_exclusion_cap_zar"));
+        .any(|i| i.field == "primary_residence_cgt_exclusion_cap_amount"));
     assert!(err
         .issues
         .iter()
@@ -150,12 +150,12 @@ fn rejects_primary_residence_exclusion_for_company() {
 fn rejects_non_resident_foreign_asset_marked_for_estate_duty() {
     let mut input = valid_input();
     input.residency_status = ResidencyStatus::NonResident;
-    input.assets[0].situs_in_south_africa = false;
+    input.assets[0].situs_in_jurisdiction = false;
     input.assets[0].included_in_estate_duty = true;
 
     let err = input.validate().expect_err("Expected validation to fail");
     assert!(err
         .issues
         .iter()
-        .any(|i| i.field == "assets[0].situs_in_south_africa"));
+        .any(|i| i.field == "assets[0].situs_in_jurisdiction"));
 }
