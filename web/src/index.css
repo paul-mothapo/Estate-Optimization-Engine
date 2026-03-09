@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100%;
+}
+
+body {
+  font-family: 'Avenir Next', 'Segoe UI', 'Trebuchet MS', sans-serif;
+  line-height: 1.5;
+  color: #112240;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background:
+    radial-gradient(900px 500px at 88% -15%, #bae6fd 0%, transparent 55%),
+    radial-gradient(750px 380px at -12% 110%, #fed7aa 0%, transparent 55%),
+    linear-gradient(180deg, #f8fafc 0%, #fff7ed 100%);
+}
